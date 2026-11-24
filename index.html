@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v6.0</title>
+<title>Catálogo Pro PDF v7.0</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
-  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  * { box-sizing: border-box; font-family: sans-serif; }
   body { margin: 0; background: #f3f4f6; color: #1f2937; }
   .container { max-width: 1100px; margin: 0 auto; padding: 14px; }
   .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
@@ -20,7 +20,6 @@
     width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
   }
   button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
-  button:active { transform: scale(0.98); }
   .btn-blue { background: #2563eb; color: #fff; }
   .btn-green { background: #16a34a; color: #fff; }
   .btn-indigo { background: #4f46e5; color: #fff; }
@@ -28,7 +27,7 @@
   .btn-red { background: #fee2e2; color: #dc2626; padding: 4px 8px; font-size: 11px; }
   .hidden { display: none !important; }
   .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; gap: 8px; }
-  .item-thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 6px; background: #e5e7eb; flex-shrink: 0; }
+  .item-thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 6px; background: #e5e7eb; }
 </style>
 </head>
 <body>
@@ -39,29 +38,15 @@
       <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span id="badgeStatus" style="font-size:11px; background:#fee2e2; color:#dc2626; padding:2px 6px; border-radius:6px;">🔴 Carregando...</span></h1>
       <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
-    <div style="display:flex; gap:8px;">
-      <button type="button" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
-    </div>
+    <button type="button" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
   </div>
 
   <div class="card" style="border-left: 4px solid #2563eb;">
     <div class="grid-4">
-      <div>
-        <label>1. NOME DA LOJA</label>
-        <input type="text" id="nomeLoja" value="Loja Simone Lit">
-      </div>
-      <div>
-        <label>2. LINK DO SITE</label>
-        <input type="url" id="linkSite" value="https://simonelit.com.br">
-      </div>
-      <div>
-        <label>3. NÚMERO WHATSAPP</label>
-        <input type="text" id="numWhatsapp" value="553132843022">
-      </div>
-      <div>
-        <label>4. TOTAL DE PRODUTOS</label>
-        <input type="number" id="totalProdutos" value="12" min="1" max="300">
-      </div>
+      <div><label>1. NOME DA LOJA</label><input type="text" id="nomeLoja" value="Loja Simone Lit"></div>
+      <div><label>2. LINK DO SITE</label><input type="url" id="linkSite" value="https://simonelit.com.br"></div>
+      <div><label>3. NÚMERO WHATSAPP</label><input type="text" id="numWhatsapp" value="553132843022"></div>
+      <div><label>4. TOTAL DE PRODUTOS</label><input type="number" id="totalProdutos" value="12" min="1" max="300"></div>
     </div>
   </div>
 
@@ -87,8 +72,8 @@
         <label>Produtos por Página</label>
         <select id="tipoGrade">
           <option value="1">1 Produto Grande por Página</option>
-          <option value="2" selected>2 Produtos por Linha (Padrão)</option>
-          <option value="3">3 Produtos por Linha (Compacto)</option>
+          <option value="2" selected>2 Produtos por Linha</option>
+          <option value="3">3 Produtos por Linha</option>
         </select>
       </div>
 
@@ -104,7 +89,7 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:13px;">
           <span><input type="checkbox" id="attrPreco" checked> Preço</span>
           <span><input type="checkbox" id="attrSku" checked> Ref/SKU</span>
-          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos/Detalhes</span>
+          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos</span>
           <span><input type="checkbox" id="attrQr" checked> QR Code</span>
         </div>
       </div>
@@ -118,14 +103,11 @@
           <input type="text" id="catExtracao" value="Destaques" placeholder="Categoria" style="flex:1; min-width:100px;">
           <button type="button" id="btnExtrair" class="btn-indigo">Importar</button>
         </div>
-
         <details style="margin-top:8px; border-top:1px solid #c7d2fe; padding-top:8px;">
           <summary style="font-size:12px; font-weight:700; color:#312e81; cursor:pointer;">📋 2. Alternativa: Colar Código/Texto da Página</summary>
-          <p style="font-size:11px; color:#4338ca; margin:6px 0;">Abra a página da loja, aperte <b>Ctrl+U</b> ou <b>Ctrl+A</b>, copie tudo e cole abaixo:</p>
-          <textarea id="htmlColado" rows="3" placeholder="Cole aqui o HTML ou texto copiado da loja..." style="font-size:12px; margin-bottom:6px;"></textarea>
+          <textarea id="htmlColado" rows="3" placeholder="Cole aqui o Ctrl+U ou Ctrl+A da loja..." style="font-size:12px; margin:6px 0;"></textarea>
           <button type="button" id="btnProcessarColado" class="btn-blue" style="width:100%;">Processar Conteúdo Colado</button>
         </details>
-
         <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
       </div>
 
@@ -138,7 +120,7 @@
         </div>
         <div class="grid-3" style="margin-bottom:8px;">
           <input type="text" id="prodSku" placeholder="Ref/SKU">
-          <input type="text" id="prodSpecs" placeholder="Detalhes (ex: P, M, G)">
+          <input type="text" id="prodSpecs" placeholder="Detalhes">
           <input type="url" id="prodLink" placeholder="Link do produto">
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
@@ -157,19 +139,23 @@
     </div>
   </div>
 </div>
-
 <div id="qrTemp" style="display:none;"></div>
-
 <script>
+  window.onerror = function(msg, url, line) {
+    var b = document.getElementById("badgeStatus");
+    if (b) {
+      b.innerText = "⚠️ Erro linha " + line + ": " + msg;
+      b.style.background = "#fef3c7";
+      b.style.color = "#b45309";
+    }
+  };
+
   var logoBase64 = null;
   var produtos = [];
 
   function pegarOrigem(urlStr) {
     var partes = urlStr.split("/");
-    if (partes.length >= 3) {
-      return partes.slice(0, 3).join("/");
-    }
-    return urlStr;
+    return partes.length >= 3 ? partes.slice(0, 3).join("/") : urlStr;
   }
 
   function setNicho(nicho) {
@@ -189,11 +175,209 @@
   }
 
   function lerLogo(event) {
-    var listaArquivos = event.target.files;
-    if (!listaArquivos || listaArquivos.length === 0) return;
+    var files = event.target.files;
+    if (!files || files.length === 0) return;
     var reader = new FileReader();
     reader.onload = function(e) { logoBase64 = e.target.result; };
-    reader.readAsDataURL(listaArquivos.item(0));
+    reader.readAsDataURL(files.item(0));
   }
 
   function addManual() {
+    var nome = document.getElementById("prodNome").value.trim();
+    if (!nome) return alert("Digite o nome do produto.");
+
+    var cat = document.getElementById("prodCat").value.trim() || "Geral";
+    var preco = document.getElementById("prodPreco").value.trim() || "";
+    var sku = document.getElementById("prodSku").value.trim() || "";
+    var specs = document.getElementById("prodSpecs").value.trim() || "";
+    var link = document.getElementById("prodLink").value.trim() || document.getElementById("linkSite").value.trim();
+    var fileInput = document.getElementById("prodImagem");
+
+    var salvar = function(imgData) {
+      produtos.push({ nome: nome, cat: cat, preco: preco, sku: sku, specs: specs, link: link, img: imgData });
+      document.getElementById("prodNome").value = "";
+      document.getElementById("prodPreco").value = "";
+      document.getElementById("prodSku").value = "";
+      document.getElementById("prodSpecs").value = "";
+      document.getElementById("prodLink").value = "";
+      fileInput.value = "";
+      renderizarLista();
+    };
+
+    if (fileInput.files && fileInput.files.length > 0) {
+      var reader = new FileReader();
+      reader.onload = function(e) { salvar(e.target.result); };
+      reader.readAsDataURL(fileInput.files.item(0));
+    } else {
+      salvar(null);
+    }
+  }
+
+  function removerItem(idx) {
+    produtos.splice(idx, 1);
+    renderizarLista();
+  }
+
+  function limparLista() {
+    produtos = [];
+    renderizarLista();
+  }
+
+  function renderizarLista() {
+    var container = document.getElementById("listaItens");
+    document.getElementById("contagemItens").innerText = produtos.length;
+    if (produtos.length === 0) {
+      container.innerHTML = '<p style="font-size:12px; color:#9ca3af; text-align:center; padding:16px 0;">Nenhum produto adicionado.</p>';
+      return;
+    }
+    container.innerHTML = produtos.map(function(p, i) {
+      var thumb = p.img
+        ? '<img src="' + p.img + '" class="item-thumb">'
+        : '<div class="item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;">Sem foto</div>';
+      return '<div class="item-row">' +
+        '<div style="display:flex; align-items:center; gap:10px; overflow:hidden;">' +
+          thumb +
+          '<div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' +
+            '<div style="font-weight:700; font-size:13px;">' + p.nome + '</div>' +
+            '<div style="font-size:11px; color:#6b7280;">' + p.cat + ' • ' + p.preco + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" onclick="removerItem(' + i + ')" class="btn-red">X</button>' +
+      '</div>';
+    }).join("");
+  }
+
+  function urlParaBase64(imgUrl) {
+    if (!imgUrl) return Promise.resolve(null);
+    if (imgUrl.indexOf("data:image") === 0) return Promise.resolve(imgUrl);
+    var clean = imgUrl.replace(/^https?:\/\//, "");
+    var proxy = "https://weserv.nl" + encodeURIComponent(clean) + "&w=500&output=jpg";
+    return fetch(proxy).then(function(r) { return r.ok ? r.blob() : null; }).then(function(blob) {
+      if (!blob) return null;
+      return new Promise(function(res) {
+        var rd = new FileReader();
+        rd.onloadend = function() { res(rd.result); };
+        rd.onerror = function() { res(null); };
+        rd.readAsDataURL(blob);
+      });
+    }).catch(function() { return null; });
+  }
+
+  async function analisarHtml(htmlStr, baseUrl, nomeCat) {
+    var limite = parseInt(document.getElementById("totalProdutos").value) || 12;
+    var status = document.getElementById("statusExtracao");
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(htmlStr, "text/html");
+    var origem = pegarOrigem(baseUrl);
+
+    var cards = doc.querySelectorAll(".js-item-product, .item-product, .product, .grid-item, [data-product-id]");
+    var achados = [];
+
+    cards.forEach(function(card) {
+      if (achados.length >= limite) return;
+      var tEl = card.querySelector(".js-item-name, .item-name, .woocommerce-loop-product__title, h2, h3, a[title]");
+      var pEl = card.querySelector(".js-price-display, .item-price, .price, [data-product-price]");
+      var iEl = card.querySelector("img");
+      var lEl = card.querySelector("a");
+
+      var nome = tEl ? (tEl.getAttribute("title") || tEl.innerText).trim() : "";
+      if (!nome) return;
+
+      var imgSrc = "";
+      if (iEl) {
+        var srcset = iEl.getAttribute("data-srcset") || iEl.getAttribute("srcset") || "";
+        imgSrc = srcset ? srcset.split(",").pop().trim().split(" ").shift() : (iEl.getAttribute("data-src") || iEl.getAttribute("src") || "");
+      }
+      if (imgSrc.indexOf("//") === 0) imgSrc = "https:" + imgSrc;
+      else if (imgSrc.indexOf("/") === 0) imgSrc = origem + imgSrc;
+
+      var link = lEl ? lEl.getAttribute("href") : baseUrl;
+      if (link && link.indexOf("/") === 0) link = origem + link;
+
+      var preco = pEl ? pEl.innerText.trim().split("\n").shift().trim() : "";
+      achados.push({ nome: nome, cat: nomeCat, preco: preco, sku: "", specs: "", link: link || baseUrl, rawImg: imgSrc });
+    });
+
+    if (achados.length === 0 && htmlStr.indexOf("<html") === -1) {
+      var linhas = htmlStr.split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
+      for (var j = 0; j < linhas.length; j++) {
+        if (achados.length >= limite) break;
+        var atual = linhas.slice(j, j + 1).shift();
+        if (atual.indexOf("R$") === 0 && j > 0) {
+          var ant = linhas.slice(j - 1, j).shift();
+          if (ant.length > 4 && ant.indexOf("R$") !== 0 && ant.indexOf("OFF") === -1) {
+            achados.push({ nome: ant, cat: nomeCat, preco: atual, sku: "", specs: "", link: baseUrl, rawImg: null });
+          }
+        }
+      }
+    }
+
+    if (achados.length > 0) {
+      for (var i = 0; i < achados.length; i++) {
+        var it = achados.slice(i, i + 1).shift();
+        status.innerText = "Baixando imagem " + (i + 1) + "/" + achados.length + "...";
+        var b64 = await urlParaBase64(it.rawImg);
+        produtos.push({ nome: it.nome, cat: it.cat, preco: it.preco, sku: "", specs: "", link: it.link, img: b64 });
+      }
+      status.style.color = "#16a34a";
+      status.innerText = "✅ " + achados.length + " produtos importados!";
+      renderizarLista();
+      return true;
+    }
+    return false;
+  }
+
+  async function extrairSite() {
+    var url = document.getElementById("urlExtracao").value.trim();
+    var cat = document.getElementById("catExtracao").value.trim() || "Coleção";
+    var status = document.getElementById("statusExtracao");
+    var btn = document.getElementById("btnExtrair");
+
+    btn.disabled = true;
+    status.classList.remove("hidden");
+    status.style.color = "#4f46e5";
+    status.innerText = "Conectando (Tentativa 1/3)...";
+
+    var html = null;
+    try {
+      var r1 = await fetch("https://codetabs.com" + encodeURIComponent(url));
+      if (r1.ok) html = await r1.text();
+    } catch (e1) {}
+
+    if (!html) {
+      status.innerText = "Conectando (Tentativa 2/3)...";
+      try {
+        var r2 = await fetch("https://corsproxy.io?" + encodeURIComponent(url));
+        if (r2.ok) html = await r2.text();
+      } catch (e2) {}
+    }
+
+    if (!html) {
+      status.innerText = "Conectando (Tentativa 3/3)...";
+      try {
+        var r3 = await fetch("https://allorigins.win" + encodeURIComponent(url));
+        if (r3.ok) { var j3 = await r3.json(); html = j3.contents; }
+      } catch (e3) {}
+    }
+
+    if (html) {
+      var ok = await analisarHtml(html, url, cat);
+      if (!ok) {
+        status.style.color = "#d97706";
+        status.innerText = "⚠️ Layout protegido. Use a opção '2. Colar Código/Texto' acima!";
+      }
+    } else {
+      status.style.color = "#dc2626";
+      status.innerText = "❌ Bloqueio do site. Abra a loja, aperte Ctrl+U -> Ctrl+A -> Ctrl+C e cole na opção 2!";
+    }
+    btn.disabled = false;
+  }
+
+  async function processarColado() {
+    var txt = document.getElementById("htmlColado").value.trim();
+    if (!txt) return alert("Cole o conteúdo da página primeiro.");
+    var url = document.getElementById("linkSite").value.trim() || "https://simonelit.com.br";
+    var cat = document.getElementById("catExtracao").value.trim() || "Coleção";
+    var status = document.getElementById("statusExtracao");
+    status.classList.remove("hidden");
+    status.style.color = "#4f46e5";
