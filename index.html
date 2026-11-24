@@ -3,40 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v20</title>
+<title>Lookbook PDF</title>
 <style>
-  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
-  .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
-  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  *{box-sizing:border-box;font-family:sans-serif}
+  body{margin:0;background:#f3f4f6;color:#1f2937}
+  .box{max-width:900px;margin:0 auto;padding:12px}
+  .card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
+  .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
   input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-  button:disabled{opacity:0.6;cursor:not-allowed}
+  button{cursor:pointer;border:0;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
+  button:disabled{opacity:.6;cursor:not-allowed}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
-  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
-  .item img{width:100%;height:100%;object-fit:cover}
+  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#fff;border:1px solid #e5e7eb}
+  .item img{width:100%;height:100%;object-fit:contain}
   .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
+  @media(max-width:600px){
+    .g3{grid-template-columns:1fr}
+    .card:first-child{gap:8px;align-items:flex-start!important;flex-direction:column}
+  }
 </style>
 </head>
 <body>
 <div class="box">
   <div class="card" style="display:flex;justify-content:space-between;align-items:center">
     <div>
-      <b style="font-size:18px">Lookbook PDF</b> 
-      <span id="st" style="font-size:11px;background:#fef3c7;color:#b45309;padding:3px 7px;border-radius:6px">🟡 Carregando biblioteca...</span>
+      <b style="font-size:18px">Lookbook PDF</b>
+      <span id="st" style="font-size:11px;background:#fef3c7;color:#b45309;padding:3px 7px;border-radius:6px">🟡 Carregando jsPDF...</span>
     </div>
     <button id="bPdf" style="background:#16a34a" disabled>📄 BAIXAR PDF</button>
   </div>
+
   <div class="card g3">
     <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
     <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
     <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
   </div>
+
   <div class="card g3">
     <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
-    <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
+    <div>
+      <label>Fotos/Linha</label>
+      <select id="col">
+        <option value="1">1 Grande</option>
+        <option value="2" selected>2 Padrão</option>
+        <option value="3">3 Compacto</option>
+      </select>
+    </div>
     <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
   </div>
+
   <div class="card">
     <label>Adicionar Foto(s) + Link do Produto</label>
     <div class="g3" style="margin-bottom:8px">
@@ -46,182 +62,299 @@
     </div>
     <div style="display:flex;gap:6px">
       <input id="uImg" placeholder="Ou cole o link direto da foto">
-      <button id="bUrl" style="background:#4f46e5">+ Link Foto</button>
+      <button id="bUrl" style="background:#4f46e5;white-space:nowrap">+ Link Foto</button>
     </div>
   </div>
+
   <div class="card">
-    <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <label>Fotos (<span id="qtd">0</span>)</label>
+      <button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button>
+    </div>
     <div id="grid" class="grid"></div>
   </div>
 </div>
 
 <script>
-window.onerror = function(m, u, l) {
+(function(){
   var st = document.getElementById("st");
-  st.innerText = "⚠️ L" + l + ": " + m;
-  st.style.background = "#fee2e2";
-  st.style.color = "#dc2626";
-};
+  var btnPdf = document.getElementById("bPdf");
+  var itens = [];
 
-var sc = document.createElement("script");
-sc.src = "https://cloudflare.com";
-sc.onload = function() {
-  var st = document.getElementById("st");
-  st.innerText = "🟢 v20 Ativo";
-  st.style.background = "#dcfce7";
-  st.style.color = "#15803d";
-  document.getElementById("bPdf").disabled = false;
-};
-sc.onerror = function() {
-  var st = document.getElementById("st");
-  st.innerText = "🔴 Falha ao carregar jsPDF";
-  st.style.background = "#fee2e2";
-  st.style.color = "#dc2626";
-};
-document.head.appendChild(sc);
+  function setStatus(text, ok){
+    st.textContent = text;
+    st.style.background = ok ? "#dcfce7" : "#fee2e2";
+    st.style.color = ok ? "#15803d" : "#dc2626";
+  }
 
-var itens = [];
+  // Carrega a biblioteca jsPDF.
+  var sc = document.createElement("script");
+  sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  sc.onload = function(){
+    if(window.jspdf && window.jspdf.jsPDF){
+      setStatus("🟢 jsPDF pronto", true);
+      btnPdf.disabled = false;
+    } else {
+      setStatus("🔴 jsPDF carregou, mas não foi encontrado", false);
+    }
+  };
+  sc.onerror = function(){
+    setStatus("🔴 Falha ao carregar jsPDF. Verifique a conexão.", false);
+  };
+  document.head.appendChild(sc);
 
-function render() {
-  document.getElementById("qtd").innerText = itens.length;
-  document.getElementById("grid").innerHTML = itens.map(function(it, i) {
-    return '<div class="item"><img src="' + it.img + '"><button class="del" onclick="itens.splice(' + i + ',1);render()">✕</button></div>';
-  }).join("");
-}
+  function normalizarUrl(valor, fallback){
+    var v = (valor || "").trim() || (fallback || "").trim();
+    if(!v) return "";
+    if(!/^https?:\/\//i.test(v)) v = "https://" + v;
+    try {
+      return new URL(v).href;
+    } catch(e) {
+      return "";
+    }
+  }
 
-document.getElementById("bAdd").onclick = function() {
-  var f = document.getElementById("fImg");
-  if (!f.files || !f.files.length) return alert("Escolha foto(s).");
-  var l = document.getElementById("fLink").value.trim() || document.getElementById("site").value;
-  Array.from(f.files).forEach(function(file) {
-    var r = new FileReader();
-    r.onload = function(e) {
-      itens.push({ img: e.target.result, l: l });
-      render();
-    };
-    r.readAsDataURL(file);
-  });
-  f.value = "";
-};
+  function render(){
+    var grid = document.getElementById("grid");
+    document.getElementById("qtd").textContent = itens.length;
+    grid.replaceChildren();
 
-document.getElementById("bUrl").onclick = function() {
-  var u = document.getElementById("uImg").value.trim();
-  if (!u) return alert("Cole o link da foto.");
-  var l = document.getElementById("fLink").value.trim() || document.getElementById("site").value;
-  itens.push({ img: u, l: l });
-  document.getElementById("uImg").value = "";
-  render();
-};
+    itens.forEach(function(it, i){
+      var card = document.createElement("div");
+      card.className = "item";
 
-document.getElementById("bLimpar").onclick = function() {
-  itens = [];
-  render();
-};
+      var img = document.createElement("img");
+      img.src = it.img;
+      img.alt = "Foto do produto " + (i + 1);
 
-function toB64(u) {
-  if (!u || u.indexOf("data:image") === 0) return Promise.resolve(u);
-  var px = "https://weserv.nl" + encodeURIComponent(u.replace(/^https?:\/\//, "")) + "&w=600&output=jpg";
-  return fetch(px)
-    .then(function(r) { return r.ok ? r.blob() : null; })
-    .then(function(b) {
-      return b ? new Promise(function(res) {
-        var rd = new FileReader();
-        rd.onloadend = function() { res(rd.result); };
-        rd.readAsDataURL(b);
-      }) : null;
-    })
-    .catch(function() { return null; });
-}
+      var del = document.createElement("button");
+      del.className = "del";
+      del.type = "button";
+      del.textContent = "✕";
+      del.setAttribute("aria-label", "Remover foto");
+      del.onclick = function(){
+        itens.splice(i, 1);
+        render();
+      };
 
-document.getElementById("bPdf").onclick = function() {
-  if (!itens.length) return alert("Adicione fotos primeiro.");
-  var Ctor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if (!Ctor) return alert("Biblioteca ainda não carregada. Recarregue a página.");
-  
-  var btn = this;
-  btn.innerText = "Gerando...";
-  btn.disabled = true;
+      card.append(img, del);
+      grid.appendChild(card);
+    });
+  }
 
-  Promise.all(itens.map(function(it) {
-    return toB64(it.img).then(function(b) { return { b: b, l: it.l }; });
-  })).then(function(prontos) {
-    var doc = new Ctor();
+  document.getElementById("bAdd").onclick = function(){
+    var input = document.getElementById("fImg");
+    if(!input.files || !input.files.length) return alert("Escolha foto(s).");
+
+    var lojaUrl = normalizarUrl(document.getElementById("site").value);
+    var link = normalizarUrl(document.getElementById("fLink").value, lojaUrl);
+
+    Array.from(input.files).forEach(function(file){
+      if(!file.type || file.type.indexOf("image/") !== 0) return;
+
+      var reader = new FileReader();
+      reader.onload = function(e){
+        itens.push({img:e.target.result, l:link || lojaUrl});
+        render();
+      };
+      reader.onerror = function(){
+        alert("Não foi possível ler o arquivo " + file.name + ".");
+      };
+      reader.readAsDataURL(file);
+    });
+
+    input.value = "";
+  };
+
+  document.getElementById("bUrl").onclick = function(){
+    var urlFoto = document.getElementById("uImg").value.trim();
+    if(!urlFoto) return alert("Cole o link da foto.");
+
+    var imgUrl = normalizarUrl(urlFoto);
+    if(!imgUrl) return alert("O link da foto não parece válido.");
+
+    var site = normalizarUrl(document.getElementById("site").value);
+    var link = normalizarUrl(document.getElementById("fLink").value, site);
+
+    itens.push({img:imgUrl, l:link || site});
+    document.getElementById("uImg").value = "";
+    render();
+  };
+
+  document.getElementById("bLimpar").onclick = function(){
+    itens = [];
+    render();
+  };
+
+  // Ajusta a foto inteira em uma área branca, sem cortes nem distorção.
+  function processarImagem(url, targetRatio){
+    return new Promise(function(resolve){
+      var src = url;
+
+      if(url && url.indexOf("data:image/") !== 0){
+        src = "https://images.weserv.nl/?url=" +
+          encodeURIComponent(url) + "&w=1200&output=jpg";
+      }
+
+      var img = new Image();
+      img.crossOrigin = "anonymous";
+
+      img.onload = function(){
+        var iw = img.naturalWidth || img.width;
+        var ih = img.naturalHeight || img.height;
+        if(!iw || !ih) return resolve(null);
+
+        var canvas = document.createElement("canvas");
+        canvas.width = 1000;
+        canvas.height = Math.max(1, Math.round(1000 / targetRatio));
+
+        var ctx = canvas.getContext("2d");
+        if(!ctx) return resolve(null);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        var scale = Math.min(canvas.width / iw, canvas.height / ih);
+        var dw = iw * scale;
+        var dh = ih * scale;
+
+        ctx.drawImage(
+          img, 0, 0, iw, ih,
+          (canvas.width - dw) / 2,
+          (canvas.height - dh) / 2,
+          dw, dh
+        );
+
+        try {
+          resolve(canvas.toDataURL("image/jpeg", 0.9));
+        } catch(e) {
+          resolve(null);
+        }
+      };
+
+      img.onerror = function(){ resolve(null); };
+      img.src = src;
+    });
+  }
+
+  btnPdf.onclick = function(){
+    if(!itens.length) return alert("Adicione fotos primeiro.");
+
+    var JsPDF = window.jspdf && window.jspdf.jsPDF;
+    if(!JsPDF){
+      return alert("A biblioteca jsPDF não carregou. Verifique a conexão e recarregue a página.");
+    }
+
+    var btn = this;
+    btn.textContent = "Gerando...";
+    btn.disabled = true;
+
+    var cols = parseInt(document.getElementById("col").value, 10) || 2;
+    var doc = new JsPDF();
     var w = doc.internal.pageSize.getWidth();
     var h = doc.internal.pageSize.getHeight();
-    var loja = document.getElementById("loja").value;
-    var site = document.getElementById("site").value;
-    var wpp = "https://wa.me" + document.getElementById("wpp").value.replace(/\D/g, "");
-    var hex = document.getElementById("cor").value.replace("#", "");
-    var n = parseInt(hex, 16);
-    var r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
-    var cols = parseInt(document.getElementById("col").value) || 2;
-
-    doc.setFillColor(r, g, b);
-    doc.rect(0, 0, w, h, "F");
-    doc.setTextColor(255);
-    doc.setFontSize(26);
-    doc.text(loja.toUpperCase(), w / 2, 125, { align: "center" });
-    doc.setFontSize(13);
-    doc.text(document.getElementById("capa").value.toUpperCase(), w / 2, 140, { align: "center" });
-
-    var rodape = function() {
-      doc.setFillColor(r, g, b);
-      doc.roundedRect(w - 92, h - 17, 40, 9, 2, 2, "F");
-      doc.setTextColor(255);
-      doc.setFontSize(8);
-      doc.text("VER NO SITE", w - 72, h - 11, { align: "center" });
-      doc.link(w - 92, h - 17, 40, 9, { url: site });
-
-      doc.setFillColor(22, 163, 74);
-      doc.roundedRect(w - 50, h - 17, 40, 9, 2, 2, "F");
-      doc.text("WHATSAPP", w - 30, h - 11, { align: "center" });
-      doc.link(w - 50, h - 17, 40, 9, { url: wpp });
-    };
-
-    doc.addPage();
-    var m = 10, gap = 6;
+    var m = 10;
+    var gap = 6;
     var cw = (w - m * 2 - gap * (cols - 1)) / cols;
     var ch = cols === 1 ? 220 : (cols === 2 ? 115 : 78);
-    var col = 0, y = 14;
+    var targetRatio = cw / ch;
 
-    for (var i = 0; i < prontos.length; i++) {
-      var it = prontos[i];
-      if (y + ch > h - 22) {
-        rodape();
-        doc.addPage();
-        y = 14;
-        col = 0;
+    Promise.all(itens.map(function(it){
+      return processarImagem(it.img, targetRatio).then(function(data){
+        return {b:data, l:it.l};
+      });
+    })).then(function(prontos){
+      var loja = document.getElementById("loja").value.trim() || "Lookbook";
+      var site = normalizarUrl(document.getElementById("site").value);
+      var numeroWpp = document.getElementById("wpp").value.replace(/\D/g, "");
+      var wpp = numeroWpp ? "https://wa.me/" + numeroWpp : "";
+
+      var hex = document.getElementById("cor").value.replace("#", "");
+      var n = parseInt(hex, 16) || 0x1e293b;
+      var r = (n >> 16) & 255;
+      var g = (n >> 8) & 255;
+      var b = n & 255;
+
+      // Capa
+      doc.setFillColor(r, g, b);
+      doc.rect(0, 0, w, h, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(26);
+      doc.text(doc.splitTextToSize(loja.toUpperCase(), w - 30), w / 2, 125, {align:"center"});
+      doc.setFontSize(13);
+      doc.text(
+        doc.splitTextToSize(document.getElementById("capa").value.toUpperCase(), w - 30),
+        w / 2, 140, {align:"center"}
+      );
+
+      function rodape(){
+        doc.setFillColor(r, g, b);
+        doc.roundedRect(w - 92, h - 17, 40, 9, 2, 2, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text("VER NO SITE", w - 72, h - 11, {align:"center"});
+        if(site) doc.link(w - 92, h - 17, 40, 9, {url:site});
+
+        doc.setFillColor(22, 163, 74);
+        doc.roundedRect(w - 50, h - 17, 40, 9, 2, 2, "F");
+        doc.text("WHATSAPP", w - 30, h - 11, {align:"center"});
+        if(wpp) doc.link(w - 50, h - 17, 40, 9, {url:wpp});
       }
-      var x = m + col * (cw + gap);
-      if (it.b) {
-        try {
-          doc.addImage(it.b, x, y, cw, ch);
-        } catch (e) {
-          doc.setFillColor(240);
+
+      // Páginas dos produtos
+      doc.addPage();
+      var col = 0;
+      var y = 14;
+
+      for(var i = 0; i < prontos.length; i++){
+        var it = prontos[i];
+
+        if(y + ch > h - 22){
+          rodape();
+          doc.addPage();
+          y = 14;
+          col = 0;
+        }
+
+        var x = m + col * (cw + gap);
+
+        if(it.b){
+          try {
+            doc.addImage(it.b, "JPEG", x, y, cw, ch);
+          } catch(e) {
+            doc.setFillColor(240, 240, 240);
+            doc.rect(x, y, cw, ch, "F");
+          }
+        } else {
+          doc.setFillColor(240, 240, 240);
           doc.rect(x, y, cw, ch, "F");
         }
-      } else {
-        doc.setFillColor(240);
-        doc.rect(x, y, cw, ch, "F");
+
+        var produtoUrl = normalizarUrl(it.l, site);
+        if(produtoUrl) doc.link(x, y, cw, ch, {url:produtoUrl});
+
+        col++;
+        if(col >= cols){
+          col = 0;
+          y += ch + gap;
+        }
       }
-      doc.link(x, y, cw, ch, { url: it.l || site });
-      col++;
-      if (col >= cols) {
-        col = 0;
-        y += ch + gap;
-      }
-    }
-    
-    rodape();
-    doc.save("Lookbook_" + loja.replace(/\s+/g, "_") + ".pdf");
-    btn.innerText = "📄 BAIXAR PDF";
-    btn.disabled = false;
-  }).catch(function(e) {
-    alert("Erro: " + e.message);
-    btn.innerText = "📄 BAIXAR PDF";
-    btn.disabled = false;
-  });
-};
+
+      rodape();
+
+      var nomeArquivo = loja
+        .replace(/[^\p{L}\p{N}_-]+/gu, "_")
+        .replace(/^_+|_+$/g, "") || "Lookbook";
+
+      doc.save("Lookbook_" + nomeArquivo + ".pdf");
+    }).catch(function(e){
+      alert("Não foi possível gerar o PDF: " + (e && e.message ? e.message : "erro inesperado."));
+    }).finally(function(){
+      btn.textContent = "📄 BAIXAR PDF";
+      btn.disabled = false;
+    });
+  };
+})();
 </script>
 </body>
 </html>
