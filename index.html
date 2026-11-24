@@ -1,1 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lookbook PDF v16</title>
+<script src="https://cloudflare.com"></script>
+<style>
+  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
+  .box{max-width:960px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
+  input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
+  button,a.btn{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff;text-decoration:none;display:inline-block;text-align:center}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
+  .item img{width:100%;height:100%;object-fit:cover}
+  .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div><b style="font-size:18px">Catálogo Lookbook</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
+    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
+  </div>
+  <div class="card g4">
+    <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
+    <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
+    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
+    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
+  </div>
+  <div class="card g3">
+    <div><label>Título Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
+    <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
+    <div><label>Rodapé</label><input id="rod" value="Toque na foto para comprar no site ou chame no WhatsApp"></div>
+  </div>
+  <div class="card" style="background:#eef2ff;border:1px solid #c7d2fe">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <div style="font-size:12px;color:#312e81;flex:1">
+        <b>1. Captura Inteligente (Apenas 1ª Foto):</b> Arraste o botão roxo para favoritos, abra a loja, role a tela e clique nele!
+      </div>
+      <a id="bm" class="btn" style="background:#4f46e5" href="#">⚡ Capturar 1ª Foto</a>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <input id="linkDiretoImg" placeholder="2. Ou cole o link da foto (Copiar endereço da imagem)...">
+      <input id="linkDiretoProd" placeholder="Link do produto (opcional)">
+      <button id="bAddUrl" style="background:#2563eb;white-space:nowrap">+ Add Link</button>
+    </div>
+    <div id="msg" style="font-size:12px;font-weight:bold;margin-top:6px;color:#1e40af"></div>
+  </div>
+  <div class="card">
+    <label>3. Adicionar Foto(s) Salvas no Aparelho/PC</label>
+    <div class="g3" style="margin-bottom:8px">
+      <input type="file" id="fImg" accept="image/*" multiple>
+      <input id="fCat" placeholder="Categoria">
+      <input id="fLink" placeholder="Link do produto no site">
+    </div>
+    <button id="bAdd" style="background:#2563eb">+ Adicionar Foto(s)</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between"><label>Fotos Selecionadas (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div id="grid" class="grid"></div>
+  </div>
+</div>
+<script>
+var itens=[];
+function render(){
+  document.getElementById("qtd").innerText=itens.length;
+  document.getElementById("grid").innerHTML=itens.map(function(it,i){
+    return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';
+  }).join("");
+}
+var baseUrl=location.href.split("?").shift().split("#").shift();
+var code="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a,a img').forEach(function(el){var lk=el.tagName==='A'?el:el.closest('a');if(!lk||!lk.href||lk.href.indexOf('http')!==0)return;var h=lk.href.split('?').shift().split('#').shift();if(seen[h])return;var card=lk.closest('.js-item-product,.item-product,.product,.grid-item')||lk;var imgs=card.querySelectorAll('img');for(var k=0;k<imgs.length;k++){var img=imgs[k];var w=img.naturalWidth||img.width||0;if(w<120)continue;var s=img.currentSrc||img.getAttribute('data-src')||img.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('http')===0){seen[h]=1;a.push({i:s,l:h});break;}}});if(!a.length)return alert('Role a página para carregar as fotos e tente novamente!');location.href='"+baseUrl+"#d='+encodeURIComponent(JSON.stringify(a.slice(0,40)));})();";
+document.getElementById("bm").href=code;
+try{
+  if(location.hash&&location.hash.indexOf("#d=")===0){
+    var arr=JSON.parse(decodeURIComponent(location.hash.substring(3)));
+    if(Array.isArray(arr)&&arr.length){
+      itens=arr.map(function(x){return {c:"Coleção",img:x.i,l:x.l};});
+      history.replaceState(null,"",baseUrl);
+      document.getElementById("msg").innerText="✅ "+itens.length+" produtos capturados!";
+      render();
+    }
+  }
+}catch(e){}
+document.getElementById("bAddUrl").onclick=function(){
+  var u=document.getElementById("linkDiretoImg").value.trim();if(!u)return alert("Cole o endereço da imagem.");
+  var p=document.getElementById("linkDiretoProd").value.trim()||document.getElementById("site").value;
+  itens.push({c:"Coleção",img:u,l:p});document.getElementById("linkDiretoImg").value="";document.getElementById("linkDiretoProd").value="";render();
+};
+document.getElementById("bAdd").onclick=function(){
+  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha uma foto.");
+  var c=document.getElementById("fCat").value.trim()||"Coleção",l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
+  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({c:c,img:e.target.result,l:l});render();};r.readAsDataURL(file);});
+  f.value="";
+};
+document.getElementById("bLimpar").onclick=function(){itens=[];render();};
+function toB64(u){
+  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
+  return fetch("https://weserv.nl"+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
+    .then(function(r){return r.ok?r.blob():null;}).then(function(b){
+      if(!b)return null;return new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);});
+    }).catch(function(){return null;});
+}
+document.getElementById("bPdf").onclick=async function(){
+  if(!itens.length)return alert("Adicione fotos primeiro.");
+  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
+  try{
+    var doc=new window.jspdf.jsPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
+    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+    var cols=parseInt(document.getElementById("col").value)||2,rod=document.getElementById("rod").value;
+    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
+    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
+    var rodape=function(){
+      doc.setFontSize(8);doc.setTextColor(90);doc.text(rod,10,h-12);
+      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
+      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
+    };
+    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
+    for(var i=0;i<itens.length;i++){
+      var it=itens.slice(i,i+1).shift();
+      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
+      var x=m+col*(cw+gap),b64=await toB64(it.img);
+      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
+      doc.link(x,y,cw,ch,{url:it.l||site});
+      col++;if(col>=cols){col=0;y+=ch+gap;}
+    }
+    rodape();doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
+  }catch(e){alert("Erro: "+e.message);}
+  btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
+};
+var st=document.getElementById("st");st.innerText="🟢 v16 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+</script>
+</body>
+</html>
 
