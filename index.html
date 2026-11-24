@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v5.1</title>
+<title>Catálogo Pro PDF v6.0</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
@@ -20,7 +20,7 @@
     width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
   }
   button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
-  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  button:active { transform: scale(0.98); }
   .btn-blue { background: #2563eb; color: #fff; }
   .btn-green { background: #16a34a; color: #fff; }
   .btn-indigo { background: #4f46e5; color: #fff; }
@@ -36,11 +36,11 @@
 <div id="painelApp" class="container">
   <div class="card header">
     <div>
-      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span style="font-size:11px; background:#dcfce7; color:#15803d; padding:2px 6px; border-radius:6px;">v5.1</span></h1>
+      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span id="badgeStatus" style="font-size:11px; background:#fee2e2; color:#dc2626; padding:2px 6px; border-radius:6px;">🔴 Carregando...</span></h1>
       <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
     <div style="display:flex; gap:8px;">
-      <button type="button" onclick="gerarPDF()" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
+      <button type="button" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
     </div>
   </div>
 
@@ -70,15 +70,15 @@
       <div class="card">
         <label>Perfil Rápido (Nicho)</label>
         <div class="grid-3">
-          <button type="button" onclick="setNicho('moda')" class="btn-gray">👗 Moda</button>
-          <button type="button" onclick="setNicho('otica')" class="btn-gray">👓 Ótica</button>
-          <button type="button" onclick="setNicho('restaurante')" class="btn-gray">🍽️ Restaurante</button>
+          <button type="button" id="btnModa" class="btn-gray">👗 Moda</button>
+          <button type="button" id="btnOtica" class="btn-gray">👓 Ótica</button>
+          <button type="button" id="btnRest" class="btn-gray">🍽️ Restaurante</button>
         </div>
       </div>
 
       <div class="card">
         <label>Logo, Capa e Grade</label>
-        <input type="file" id="logoLoja" accept="image/*" onchange="lerLogo(event)" style="margin-bottom:10px; font-size:12px;">
+        <input type="file" id="logoLoja" accept="image/*" style="margin-bottom:10px; font-size:12px;">
         <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
           <input type="checkbox" id="incluirCapa" checked style="width:auto;">
           <span style="font-size:13px; font-weight:bold;">Capa:</span>
@@ -116,14 +116,14 @@
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
           <input type="url" id="urlExtracao" value="https://simonelit.com.br" style="flex:2; min-width:160px;">
           <input type="text" id="catExtracao" value="Destaques" placeholder="Categoria" style="flex:1; min-width:100px;">
-          <button type="button" onclick="extrairSite()" id="btnExtrair" class="btn-indigo">Importar</button>
+          <button type="button" id="btnExtrair" class="btn-indigo">Importar</button>
         </div>
 
         <details style="margin-top:8px; border-top:1px solid #c7d2fe; padding-top:8px;">
           <summary style="font-size:12px; font-weight:700; color:#312e81; cursor:pointer;">📋 2. Alternativa: Colar Código/Texto da Página</summary>
-          <p style="font-size:11px; color:#4338ca; margin:6px 0;">Abra a página da loja, aperte <b>Ctrl+U</b> (código-fonte) ou <b>Ctrl+A</b>, copie tudo e cole abaixo:</p>
+          <p style="font-size:11px; color:#4338ca; margin:6px 0;">Abra a página da loja, aperte <b>Ctrl+U</b> ou <b>Ctrl+A</b>, copie tudo e cole abaixo:</p>
           <textarea id="htmlColado" rows="3" placeholder="Cole aqui o HTML ou texto copiado da loja..." style="font-size:12px; margin-bottom:6px;"></textarea>
-          <button type="button" onclick="processarHtmlColado()" class="btn-blue" style="width:100%;">Processar Conteúdo Colado</button>
+          <button type="button" id="btnProcessarColado" class="btn-blue" style="width:100%;">Processar Conteúdo Colado</button>
         </details>
 
         <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
@@ -143,14 +143,14 @@
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           <input type="file" id="prodImagem" accept="image/*" style="font-size:12px; flex:1;">
-          <button type="button" onclick="addManual()" class="btn-blue">+ Add</button>
+          <button type="button" id="btnAddManual" class="btn-blue">+ Add</button>
         </div>
       </div>
 
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <label style="margin:0;">Itens no Catálogo (<span id="contagemItens">0</span>)</label>
-          <button type="button" onclick="limparLista()" class="btn-red">Limpar Tudo</button>
+          <button type="button" id="btnLimpar" class="btn-red">Limpar Tudo</button>
         </div>
         <div id="listaItens" style="max-height: 320px; overflow-y: auto;"></div>
       </div>
@@ -163,6 +163,14 @@
 <script>
   var logoBase64 = null;
   var produtos = [];
+
+  function pegarOrigem(urlStr) {
+    var partes = urlStr.split("/");
+    if (partes.length >= 3) {
+      return partes.slice(0, 3).join("/");
+    }
+    return urlStr;
+  }
 
   function setNicho(nicho) {
     if (nicho === "moda") {
@@ -189,4 +197,3 @@
   }
 
   function addManual() {
-    var nome = document.getElementById("prodNome").value.trim();
