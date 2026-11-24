@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v4.0</title>
+<title>Catálogo Pro PDF v5.0</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
@@ -16,7 +16,7 @@
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
-  input[type="text"], input[type="url"], input[type="number"], select {
+  input[type="text"], input[type="url"], input[type="number"], select, textarea {
     width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
   }
   button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
@@ -36,7 +36,7 @@
 <div id="painelApp" class="container">
   <div class="card header">
     <div>
-      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span style="font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 6px; border-radius:6px;">v4.0 Auto-Imagens</span></h1>
+      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span style="font-size:11px; background:#fef3c7; color:#b45309; padding:2px 6px; border-radius:6px;">v5.0 Multi-Import</span></h1>
       <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
     <div style="display:flex; gap:8px;">
@@ -112,13 +112,20 @@
 
     <div>
       <div class="card" style="background:#eef2ff; border:1px solid #c7d2fe;">
-        <label style="color:#312e81;">🚀 Extrair Direto do Site (ou URL de Categoria)</label>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+        <label style="color:#312e81;">🚀 1. Extrair Direto por Link</label>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
           <input type="url" id="urlExtracao" value="https://simonelit.com.br" style="flex:2; min-width:160px;">
-          <input type="text" id="catExtracao" value="Destaques" placeholder="Nome da Categoria" style="flex:1; min-width:110px;">
+          <input type="text" id="catExtracao" value="Destaques" placeholder="Categoria" style="flex:1; min-width:100px;">
           <button type="button" onclick="extrairSite()" id="btnExtrair" class="btn-indigo">Importar</button>
         </div>
-        <span style="font-size:11px; color:#4338ca;">Dica: Cole o link de uma categoria específica (ex: /vestido) para separar por páginas.</span>
+
+        <details style="margin-top:8px; border-top:1px solid #c7d2fe; padding-top:8px;">
+          <summary style="font-size:12px; font-weight:700; color:#312e81; cursor:pointer;">📋 2. Alternativa: Colar Código/Texto da Página (Se o link bloquear)</summary>
+          <p style="font-size:11px; color:#4338ca; margin:6px 0;">Abra a página da loja, aperte <b>Ctrl+U</b> (código-fonte) ou <b>Ctrl+A</b>, copie tudo e cole abaixo:</p>
+          <textarea id="htmlColado" rows="3" placeholder="Cole aqui o HTML ou texto copiado da loja..." style="font-size:12px; margin-bottom:6px;"></textarea>
+          <button type="button" onclick="processarHtmlColado()" class="btn-blue" style="width:100%;">Processar Conteúdo Colado</button>
+        </details>
+
         <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
       </div>
 
@@ -182,13 +189,3 @@
   }
 
   function addManual() {
-    var nome = document.getElementById("prodNome").value.trim();
-    if (!nome) return alert("Digite o nome do produto.");
-
-    var cat = document.getElementById("prodCat").value.trim() || "Geral";
-    var preco = document.getElementById("prodPreco").value.trim() || "";
-    var sku = document.getElementById("prodSku").value.trim() || "";
-    var specs = document.getElementById("prodSpecs").value.trim() || "";
-    var link = document.getElementById("prodLink").value.trim() || document.getElementById("linkSite").value.trim();
-    var fileInput = document.getElementById("prodImagem");
-
