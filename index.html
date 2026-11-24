@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v8</title>
+<title>Catálogo Pro PDF v9.0</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
@@ -19,14 +19,14 @@
 <body>
 <div class="box">
   <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <div><b style="font-size:18px">Catálogo Pro PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:5px">🔴 Erro JS</span></div>
+    <div><b style="font-size:18px">Catálogo Pro PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:5px">🔴 Carregando</span></div>
     <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
   </div>
   <div class="card g4">
     <div><label>Nome da Loja</label><input id="loja" value="Loja Simone Lit"></div>
-    <div><label>Link do Site</label><input id="site" value="https://simonelit.com.br"></div>
+    <div><label>Link do Site</label><input id="site" value="https://simonelit.com"></div>
     <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
-    <div><label>Máx. Produtos</label><input type="number" id="max" value="12"></div>
+    <div><label>Máx. Produtos</label><input type="number" id="max" value="30"></div>
   </div>
   <div class="card g3">
     <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px"></div>
@@ -34,14 +34,14 @@
     <div><label>Por Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
   </div>
   <div class="card" style="background:#eef2ff">
-    <label style="color:#312e81">Importar por Link ou Colar Texto/HTML da Loja</label>
-    <div style="display:flex;gap:6px;margin-bottom:8px">
-      <input id="urlImp" value="https://simonelit.com.br" style="flex:2">
-      <input id="catImp" value="Destaques" style="flex:1">
-      <button id="bImp" style="background:#4f46e5">Importar</button>
+    <label style="color:#312e81">Importar da Loja (https://simonelit.com)</label>
+    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+      <input id="urlImp" value="https://simonelit.com" style="flex:2;min-width:160px">
+      <input id="catImp" value="Coleção" style="flex:1;min-width:90px">
+      <button id="bImp" style="background:#4f46e5">Importar URL</button>
     </div>
-    <textarea id="txtImp" rows="2" placeholder="Ou cole aqui o Ctrl+A / Ctrl+U da página da loja..."></textarea>
-    <button id="bColar" style="background:#2563eb;width:100%;margin-top:6px">Extrair do Texto Colado</button>
+    <textarea id="txtImp" rows="3" placeholder="Dica infalível: Abra simonelit.com, aperte Ctrl+A e Ctrl+C, cole aqui e clique abaixo:"></textarea>
+    <button id="bColar" style="background:#2563eb;width:100%;margin-top:6px">Extrair do Texto/Página Colada</button>
     <div id="msgImp" style="font-size:12px;font-weight:bold;margin-top:6px"></div>
   </div>
   <div class="card">
@@ -75,60 +75,74 @@ document.getElementById("bAdd").onclick=function(){
 };
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
 function parseHtml(h,cat,base){
-  var doc=new DOMParser().parseFromString(h,"text/html"),cards=doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item"),add=0,max=parseInt(document.getElementById("max").value)||12;
+  var doc=new DOMParser().parseFromString(h,"text/html"),cards=doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item"),add=0,max=parseInt(document.getElementById("max").value)||30;
   cards.forEach(function(el){
     if(add>=max)return;
     var t=el.querySelector(".js-item-name,.item-name,h2,h3,a[title]"),pr=el.querySelector(".js-price-display,.item-price,.price"),a=el.querySelector("a");
     var nome=t?(t.getAttribute("title")||t.innerText).trim():"";if(!nome)return;
-    itens.push({n:nome,c:cat,p:pr?pr.innerText.trim().split("\n").shift():"",img:null,l:a?a.getAttribute("href"):base});add++;
+    var link=a?a.getAttribute("href"):base;if(link&&link.indexOf("/")===0)link="https://simonelit.com"+link;
+    itens.push({n:nome,c:cat,p:pr?pr.innerText.trim().split("\n").shift():"",img:null,l:link});add++;
   });
   if(!add){
-    h.split("\n").forEach(function(l,idx,arr){
-      if(add<max&&l.trim().indexOf("R$")===0&&idx>0){
-        var prev=arr.slice(idx-1,idx).shift().trim();
-        if(prev.length>4&&prev.indexOf("R$")!==0){itens.push({n:prev,c:cat,p:l.trim(),img:null,l:base});add++;}
+    var linhas=h.split("\n").map(function(x){return x.trim();}).filter(Boolean);
+    for(var i=1;i<linhas.length;i++){
+      if(add>=max)break;
+      var cur=linhas.slice(i,i+1).shift();
+      if(cur.indexOf("R$")===0&&cur!=="R$0,00"&&cur.indexOf("com Pix")===-1){
+        var prev=linhas.slice(i-1,i).shift();
+        if(prev.length>4&&prev.indexOf("R$")!==0&&prev!=="Frete grátis"&&prev!=="Incluindo..."){
+          var autoCat=prev.split(" ").shift();
+          itens.push({n:prev,c:autoCat||cat,p:cur,img:null,l:base});add++;
+        }
       }
-    });
+    }
   }
   render();return add;
 }
 document.getElementById("bImp").onclick=async function(){
   var u=document.getElementById("urlImp").value.trim(),c=document.getElementById("catImp").value.trim()||"Geral",m=document.getElementById("msgImp");
-  m.innerText="Buscando...";
+  m.innerText="Tentando conectar a "+u+"...";
   try{
-    var r=await fetch("https://codetabs.com"+encodeURIComponent(u));
-    var txt=await r.text(),n=parseHtml(txt,c,u);
-    m.innerText=n?("✅ "+n+" itens importados!"):"⚠️ Site bloqueou. Cole o texto abaixo!";
-  }catch(e){m.innerText="❌ Erro de conexão. Use a caixa de texto abaixo!";}
+    var r=await fetch("https://allorigins.win"+encodeURIComponent(u));
+    var j=await r.json(),n=parseHtml(j.contents||"",c,u);
+    m.innerText=n?("✅ "+n+" itens importados!"):("⚠️ A Nuvemshop bloqueou o robô. Abra simonelit.com, aperte Ctrl+A -> Ctrl+C e cole na caixa abaixo!");
+  }catch(e){m.innerText="⚠️ Bloqueio de CORS do site. Use a caixa de colagem abaixo (Ctrl+A -> Ctrl+C na loja)!";}
 };
 document.getElementById("bColar").onclick=function(){
-  var txt=document.getElementById("txtImp").value.trim();if(!txt)return alert("Cole o texto primeiro");
+  var txt=document.getElementById("txtImp").value.trim();if(!txt)return alert("Cole o texto da página da loja primeiro");
   var n=parseHtml(txt,document.getElementById("catImp").value.trim()||"Geral",document.getElementById("site").value);
-  document.getElementById("msgImp").innerText=n?("✅ "+n+" itens extraídos!"):"❌ Nada encontrado.";
+  document.getElementById("msgImp").innerText=n?("✅ "+n+" produtos extraídos e separados por categoria!"):("❌ Nenhum produto encontrado.");
   if(n)document.getElementById("txtImp").value="";
 };
 document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Adicione itens primeiro");
+  if(!itens.length)return alert("Adicione ou extraia itens primeiro");
   var doc=new window.jspdf.jsPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
   var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
   var cols=parseInt(document.getElementById("col").value)||2,fnt=parseInt(document.getElementById("fnt").value)||11;
-  var cw=(w-20-(cols-1)*6)/cols,ch=cols===1?110:75,ih=cols===1?75:45,col=0,y=22;
-  doc.setFillColor(30,41,59);doc.rect(10,8,w-20,10,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.text(loja.toUpperCase(),14,14.5);
-  for(var i=0;i<itens.length;i++){
-    var it=itens.slice(i,i+1).shift();
-    if(y+ch>h-20){doc.addPage();y=15;col=0;}
-    var x=10+col*(cw+6);doc.setDrawColor(220);doc.rect(x,y,cw,ch);
-    if(it.img)try{doc.addImage(it.img,"JPEG",x+2,y+2,cw-4,ih);}catch(e){}
-    doc.link(x+2,y+2,cw-4,ih,{url:it.l||site});
-    doc.setTextColor(20);doc.setFontSize(fnt);doc.text(it.n.substring(0,26),x+3,y+ih+7);
-    doc.setTextColor(22,163,74);doc.text(it.p,x+3,y+ih+13);
-    col++;if(col>=cols){col=0;y+=ch+6;}
+  var porCat={};itens.forEach(function(it){if(!porCat[it.c])porCat[it.c]=[];porCat[it.c].push(it);});
+  var cats=Object.keys(porCat);
+  for(var cIdx=0;cIdx<cats.length;cIdx++){
+    if(cIdx>0)doc.addPage();
+    var cNome=cats.slice(cIdx,cIdx+1).shift();
+    var cw=(w-20-(cols-1)*6)/cols,ch=cols===1?110:75,ih=cols===1?75:45,col=0,y=22;
+    doc.setFillColor(30,41,59);doc.rect(10,8,w-20,10,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.text(loja.toUpperCase()+" • "+cNome.toUpperCase(),14,14.5);
+    var listaCat=porCat[cNome];
+    for(var i=0;i<listaCat.length;i++){
+      var it=listaCat.slice(i,i+1).shift();
+      if(y+ch>h-20){doc.addPage();y=15;col=0;}
+      var x=10+col*(cw+6);doc.setDrawColor(220);doc.rect(x,y,cw,ch);
+      if(it.img)try{doc.addImage(it.img,"JPEG",x+2,y+2,cw-4,ih);}catch(e){}
+      doc.link(x+2,y+2,cw-4,ih,{url:it.l||site});
+      doc.setTextColor(20);doc.setFontSize(fnt);doc.text(it.n.substring(0,26),x+3,y+ih+7);
+      doc.setTextColor(22,163,74);doc.text(it.p,x+3,y+ih+13);
+      col++;if(col>=cols){col=0;y+=ch+6;}
+    }
+    doc.setFillColor(30,41,59);doc.rect(w-88,h-15,38,8,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-69,h-9.5,{align:"center"});doc.link(w-88,h-15,38,8,{url:site});
+    doc.setFillColor(22,163,74);doc.rect(w-48,h-15,38,8,"F");doc.text("WHATSAPP",w-29,h-9.5,{align:"center"});doc.link(w-48,h-15,38,8,{url:wpp});
   }
-  doc.setFillColor(30,41,59);doc.rect(w-88,h-15,38,8,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-69,h-9.5,{align:"center"});doc.link(w-88,h-15,38,8,{url:site});
-  doc.setFillColor(22,163,74);doc.rect(w-48,h-15,38,8,"F");doc.text("WHATSAPP",w-29,h-9.5,{align:"center"});doc.link(w-48,h-15,38,8,{url:wpp});
-  doc.save("Catalogo.pdf");
+  doc.save("Catalogo_"+loja.replace(/\s+/g,"_")+".pdf");
 };
-var st=document.getElementById("st");st.innerText="🟢 v8.0 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v9.0 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
