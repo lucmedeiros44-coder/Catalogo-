@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v13</title>
+<title>Lookbook PDF v15</title>
 <script src="https://cloudflare.com"></script>
 <style>
   *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
@@ -35,17 +35,22 @@
     <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
     <div><label>Rodapé</label><input id="rod" value="Toque na foto para comprar no site ou chame no WhatsApp"></div>
   </div>
-  <div class="card" style="background:#eef2ff">
+  <div class="card" style="background:#eef2ff;border:1px solid #c7d2fe">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <span style="font-size:12px;color:#312e81"><b>1. Via Favorito:</b> Arraste para favoritos, role a loja para carregar fotos e clique nele:</span>
-      <a id="bm" class="btn" style="background:#4f46e5" href="#">⚡ Capturar da Loja</a>
+      <div style="font-size:12px;color:#312e81;flex:1">
+        <b>1. Captura Inteligente (Apenas 1ª Foto de Cada Produto):</b> Arraste o botão roxo para favoritos. Abra a loja, role a tela para carregar as fotos e clique no favorito!
+      </div>
+      <a id="bm" class="btn" style="background:#4f46e5" href="#">⚡ Capturar 1ª Foto</a>
     </div>
-    <textarea id="htmlIn" rows="2" placeholder="2. Ou cole aqui o código-fonte (Ctrl+U) da página da loja..."></textarea>
-    <button id="bExtrair" style="background:#2563eb;width:100%;margin-top:6px">Extrair Fotos do Código Colado</button>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <input id="linkDiretoImg" placeholder="2. Ou cole o link da foto (Copiar endereço da imagem)...">
+      <input id="linkDiretoProd" placeholder="Link do produto (opcional)">
+      <button id="bAddUrl" style="background:#2563eb;white-space:nowrap">+ Add Link</button>
+    </div>
     <div id="msg" style="font-size:12px;font-weight:bold;margin-top:6px;color:#1e40af"></div>
   </div>
   <div class="card">
-    <label>3. Adicionar Foto(s) do Aparelho/PC</label>
+    <label>3. Adicionar Foto(s) Salvas no Aparelho/PC</label>
     <div class="g3" style="margin-bottom:8px">
       <input type="file" id="fImg" accept="image/*" multiple>
       <input id="fCat" placeholder="Categoria (ex: Vestidos)">
@@ -54,7 +59,7 @@
     <button id="bAdd" style="background:#2563eb">+ Adicionar Foto(s)</button>
   </div>
   <div class="card">
-    <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div style="display:flex;justify-content:space-between"><label>Fotos Selecionadas (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
     <div id="grid" class="grid"></div>
   </div>
 </div>
@@ -66,33 +71,44 @@ function render(){
     return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';
   }).join("");
 }
+
+// Bookmarklet: filtra apenas a PRIMEIRA foto válida de cada link de produto único (ignora 2ª foto de hover e banners)
 var baseUrl=location.href.split("?").shift().split("#").shift();
-document.getElementById("bm").href="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a').forEach(function(lk){var card=lk.closest('div,li,article')||lk.parentElement;var img=card?card.querySelector('img'):null;if(img){var s=img.getAttribute('data-srcset')||img.getAttribute('srcset')||img.getAttribute('data-src')||img.src||'';s=s.split(',').pop().trim().split(' ').shift();if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('data:')!==0&&!seen[lk.href]){seen[lk.href]=1;a.push({c:'Coleção',img:s,l:lk.href});}}});if(!a.length)return alert('Role a página da loja até as fotos carregarem e clique novamente!');window.name=JSON.stringify(a);location.href='"+baseUrl+"';})();";
-try{if(window.name&&window.name.indexOf("[{")===0){itens=JSON.parse(window.name);window.name="";document.getElementById("msg").innerText="✅ "+itens.length+" fotos capturadas!";render();}}catch(e){}
+var code="javascript:(function(){var a=[],seenLink={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a,a img').forEach(function(el){var lk=el.tagName==='A'?el:el.closest('a');if(!lk||!lk.href||lk.href.indexOf('http')!==0)return;var cleanHref=lk.href.split('?').shift().split('#').shift();if(seenLink[cleanHref])return;var card=lk.closest('.js-item-product,.item-product,.product,.grid-item')||lk;var imgs=card.querySelectorAll('img');for(var k=0;k<imgs.length;k++){var img=imgs[k];var w=img.naturalWidth||img.width||0;if(w<120)continue;var s=img.currentSrc||img.getAttribute('data-src')||img.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('http')===0){seenLink[cleanHref]=1;a.push({i:s,l:cleanHref});break;}}});if(!a.length)return alert('Role a página para carregar as fotos e tente novamente!');location.href='"+baseUrl+"#d='+encodeURIComponent(JSON.stringify(a.slice(0,40)));})();";
+document.getElementById("bm").href=code;
+
+try{
+  if(location.hash&&location.hash.indexOf("#d=")===0){
+    var raw=decodeURIComponent(location.hash.substring(3));
+    var arr=JSON.parse(raw);
+    if(Array.isArray(arr)&&arr.length){
+      itens=arr.map(function(x){return {c:"Coleção",img:x.i,l:x.l};});
+      history.replaceState(null,"",baseUrl);
+      document.getElementById("msg").innerText="✅ "+itens.length+" produtos (1ª foto de cada) capturados com sucesso!";
+      render();
+    }
+  }
+}catch(e){}
+
+document.getElementById("bAddUrl").onclick=function(){
+  var imgU=document.getElementById("linkDiretoImg").value.trim();
+  if(!imgU)return alert("Cole o endereço da imagem.");
+  var prodU=document.getElementById("linkDiretoProd").value.trim()||document.getElementById("site").value;
+  itens.push({c:"Coleção",img:imgU,l:prodU});
+  document.getElementById("linkDiretoImg").value="";
+  document.getElementById("linkDiretoProd").value="";
+  render();
+};
+
 document.getElementById("bAdd").onclick=function(){
   var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha uma foto.");
   var c=document.getElementById("fCat").value.trim()||"Coleção",l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
   Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({c:c,img:e.target.result,l:l});render();};r.readAsDataURL(file);});
   f.value="";
 };
+
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
-document.getElementById("bExtrair").onclick=function(){
-  var h=document.getElementById("htmlIn").value.trim();if(!h)return alert("Cole o código-fonte primeiro.");
-  var site=document.getElementById("site").value.trim(),doc=new DOMParser().parseFromString(h,"text/html"),add=0,seen={};
-  doc.querySelectorAll("a[href*='/produtos/'],a[href*='/produto/'],.js-item-product a").forEach(function(lk){
-    var card=lk.closest("div,li,article")||lk.parentElement;
-    var img=card?card.querySelector("img"):null;
-    if(!img)return;
-    var s=img.getAttribute("data-srcset")||img.getAttribute("srcset")||img.getAttribute("data-src")||img.getAttribute("src")||"";
-    s=s.split(",").pop().trim().split(" ").shift();
-    if(s.indexOf("//")===0)s="https:"+s;else if(s.indexOf("/")===0)s=site+s;
-    var href=lk.getAttribute("href")||site;
-    if(href.indexOf("/")===0)href=site+href;
-    if(s&&s.indexOf("data:")!==0&&!seen[href]){seen[href]=1;itens.push({c:"Coleção",img:s,l:href});add++;}
-  });
-  document.getElementById("msg").innerText=add?("✅ "+add+" fotos com links capturadas!"):("❌ Nenhuma foto encontrada. Use a opção 3 abaixo.");
-  if(add){document.getElementById("htmlIn").value="";render();}
-};
+
 function toB64(u){
   if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
   return fetch("https://weserv.nl"+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
@@ -100,6 +116,7 @@ function toB64(u){
       if(!b)return null;return new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);});
     }).catch(function(){return null;});
 }
+
 document.getElementById("bPdf").onclick=async function(){
   if(!itens.length)return alert("Adicione fotos primeiro.");
   var btn=this;btn.innerText="Gerando...";btn.disabled=true;
@@ -128,7 +145,4 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v13 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
-</script>
-</body>
-</html>
+var st=document.getElementById("st");st.innerText="🟢 v15 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
