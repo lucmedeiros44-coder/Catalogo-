@@ -3,146 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v9.0</title>
-<script src="https://cloudflare.com"></script>
+<title>Catálogo Lookbook PDF v11</title>
 <script src="https://cloudflare.com"></script>
 <style>
-  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
-  .box{max-width:960px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-  .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:3px;text-transform:uppercase}
-  input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-  .row{display:flex;justify-content:space-between;align-items:center;border:1px solid #e5e7eb;padding:7px;border-radius:7px;margin-bottom:5px;background:#f9fafb}
+  *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  body{margin:0;background:#f3f4f6;color:#1f2937}
+  .box{max-width:960px;margin:0 auto;padding:12px}
+  .card{background:#fff;padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
+  input,select,textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:14px}
+  button,a.btn{cursor:pointer;border:none;border-radius:8px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff;text-decoration:none;display:inline-block;text-align:center}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .grid-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:10px}
+  .thumb-card{position:relative;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#f9fafb;aspect-ratio:3/4}
+  .thumb-card img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb-del{position:absolute;top:4px;right:4px;background:rgba(220,38,38,.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:11px;padding:0;line-height:22px}
+  .thumb-cat{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);color:#fff;font-size:10px;padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
 <div class="box">
   <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-    <div><b style="font-size:18px">Catálogo Pro PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:5px">🔴 Carregando</span></div>
-    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
+    <div>
+      <b style="font-size:18px">Catálogo Lookbook PDF</b>
+      <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px;margin-left:6px">🔴 Carregando</span>
+      <div style="font-size:12px;color:#6b7280;margin-top:2px">Fotos 100% clicáveis • Direcionamento direto para Site e WhatsApp</div>
+    </div>
+    <button id="bPdf" style="background:#16a34a;padding:12px 18px;font-size:14px">📄 BAIXAR LOOKBOOK PDF</button>
   </div>
-  <div class="card g4">
+
+  <div class="card g4" style="border-left:4px solid #2563eb">
     <div><label>Nome da Loja</label><input id="loja" value="Loja Simone Lit"></div>
-    <div><label>Link do Site</label><input id="site" value="https://simonelit.com"></div>
-    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
-    <div><label>Máx. Produtos</label><input type="number" id="max" value="30"></div>
+    <div><label>Link Principal do Site</label><input id="site" value="https://simonelit.com"></div>
+    <div><label>WhatsApp Vendedora</label><input id="wpp" value="553132843022"></div>
+    <div><label>Cor da Capa e Botões</label><input type="color" id="cor" value="#1e293b" style="height:40px;padding:4px"></div>
   </div>
+
   <div class="card g3">
-    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px"></div>
-    <div><label>Fonte (pt)</label><input type="number" id="fnt" value="11"></div>
-    <div><label>Por Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
-  </div>
-  <div class="card" style="background:#eef2ff">
-    <label style="color:#312e81">Importar da Loja (https://simonelit.com)</label>
-    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
-      <input id="urlImp" value="https://simonelit.com" style="flex:2;min-width:160px">
-      <input id="catImp" value="Coleção" style="flex:1;min-width:90px">
-      <button id="bImp" style="background:#4f46e5">Importar URL</button>
+    <div>
+      <label>Capa do Catálogo</label>
+      <input id="capaTxt" value="NOVA COLEÇÃO • TOQUE NAS FOTOS PARA COMPRAR">
     </div>
-    <textarea id="txtImp" rows="3" placeholder="Dica infalível: Abra simonelit.com, aperte Ctrl+A e Ctrl+C, cole aqui e clique abaixo:"></textarea>
-    <button id="bColar" style="background:#2563eb;width:100%;margin-top:6px">Extrair do Texto/Página Colada</button>
-    <div id="msgImp" style="font-size:12px;font-weight:bold;margin-top:6px"></div>
+    <div>
+      <label>Fotos por Linha no PDF</label>
+      <select id="col">
+        <option value="1">1 Foto Grande por Página</option>
+        <option value="2" selected>2 Fotos por Linha (4 por página)</option>
+        <option value="3">3 Fotos por Linha (6 por página)</option>
+      </select>
+    </div>
+    <div>
+      <label>Frase do Rodapé</label>
+      <input id="rodapeTxt" value="Toque na foto para ver detalhes no site ou chame no WhatsApp">
+    </div>
   </div>
+
+  <div class="card" style="background:#eef2ff;border:1px solid #c7d2fe">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <div style="font-size:12px;color:#312e81;flex:1">
+        <b>⚡ Importação Automática com Fotos e Links:</b> Arraste o botão roxo para a barra de favoritos do navegador. Abra <b>simonelit.com</b> (ou qualquer categoria) e clique no favorito!
+      </div>
+      <a id="bmLink" class="btn" style="background:#4f46e5" href="#">⚡ Capturar Fotos da Loja</a>
+    </div>
+
+    <details>
+      <summary style="font-size:12px;font-weight:700;color:#312e81;cursor:pointer">📋 Alternativa: Colar Código-Fonte (Ctrl+U -> Ctrl+A -> Ctrl+C na Loja)</summary>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input id="catColar" value="Destaques" placeholder="Nome da Categoria" style="max-width:180px">
+        <textarea id="txtImp" rows="2" placeholder="Cole aqui o código-fonte (Ctrl+U) da página da loja para extrair fotos e links..."></textarea>
+      </div>
+      <button id="bColar" style="background:#2563eb;width:100%;margin-top:6px">Extrair Fotos e Links do Código</button>
+    </details>
+    <div id="msgImp" style="font-size:12px;font-weight:bold;margin-top:8px;color:#1e40af"></div>
+  </div>
+
   <div class="card">
-    <label>Adicionar Manualmente</label>
+    <label>Adicionar Foto + Link Manualmente</label>
     <div class="g3" style="margin-bottom:8px">
-      <input id="pNome" placeholder="Nome do produto"><input id="pCat" placeholder="Categoria"><input id="pPreco" placeholder="R$ 0,00">
+      <input type="file" id="pImg" accept="image/*" multiple>
+      <input id="pCat" placeholder="Categoria (ex: Vestidos)">
+      <input id="pLink" placeholder="Link do produto no site (opcional)">
     </div>
-    <div style="display:flex;gap:8px">
-      <input type="file" id="pImg" accept="image/*" style="flex:1"><button id="bAdd" style="background:#2563eb">+ Adicionar</button>
-    </div>
+    <button id="bAdd" style="background:#2563eb">+ Adicionar Foto(s) ao Lookbook</button>
   </div>
+
   <div class="card">
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label>Lista (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
-    <div id="lista"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <label style="margin:0">Fotos Selecionadas (<span id="qtd">0</span>)</label>
+      <button id="bLimpar" style="background:#dc2626;padding:5px 10px;font-size:11px">Limpar Tudo</button>
+    </div>
+    <div id="lista" class="grid-preview"></div>
   </div>
 </div>
-<div id="qr" style="display:none"></div>
+
 <script>
 var itens=[];
+
 function render(){
   document.getElementById("qtd").innerText=itens.length;
-  document.getElementById("lista").innerHTML=itens.map(function(p,i){
-    return '<div class="row"><span><b>'+p.n+'</b> ('+p.c+') - '+p.p+'</span><button onclick="itens.splice('+i+',1);render()" style="background:#dc2626;padding:3px 7px;font-size:11px">X</button></div>';
+  var el=document.getElementById("lista");
+  if(!itens.length){
+    el.innerHTML='<p style="grid-column:1/-1;text-align:center;color:#9ca3af;font-size:12px;padding:16px 0">Nenhuma foto adicionada ainda.</p>';
+    return;
+  }
+  el.innerHTML=itens.map(function(p,i){
+    return '<div class="thumb-card">' +
+      '<img src="'+p.img+'">' +
+      '<button type="button" class="thumb-del" onclick="itens.splice('+i+',1);render()">✕</button>' +
+      '<div class="thumb-cat">'+p.c+'</div>' +
+    '</div>';
   }).join("");
 }
+
+// Bookmarklet que captura foto em alta + link exato do produto direto na página da loja
+var geradorUrl=window.location.href.split("?").shift().split("#").shift();
+var bmCode="javascript:(function(){var arr=[],cards=document.querySelectorAll('.js-item-product,.item-product,.product,.grid-item');var cat=document.title.split('-').shift().trim()||'Coleção';cards.forEach(function(c){var i=c.querySelector('img'),a=c.querySelector('a');if(i){var img=i.getAttribute('data-src')||i.src||'';if(img.indexOf('//')===0)img='https:'+img;if(img)arr.push({c:cat,img:img,l:a?a.href:location.href});}});if(!arr.length)return alert('Nenhuma foto encontrada nesta página.');window.name=JSON.stringify(arr);location.href='"+geradorUrl+"';})();";
+document.getElementById("bmLink").setAttribute("href",bmCode);
+
+try{
+  if(window.name&&window.name.indexOf("[{")===0){
+    var importados=JSON.parse(window.name);
+    if(Array.isArray(importados)&&importados.length){
+      itens=importados;
+      window.name="";
+      document.getElementById("msgImp").innerText="✅ "+itens.length+" fotos com links diretos capturadas da loja!";
+      render();
+    }
+  }
+}catch(e){}
+
 document.getElementById("bAdd").onclick=function(){
-  var n=document.getElementById("pNome").value.trim();if(!n)return alert("Digite o nome");
-  var c=document.getElementById("pCat").value.trim()||"Geral",p=document.getElementById("pPreco").value.trim(),f=document.getElementById("pImg");
-  var push=function(img){itens.push({n:n,c:c,p:p,img:img,l:document.getElementById("site").value});document.getElementById("pNome").value="";f.value="";render();};
-  if(f.files&&f.files.length){var r=new FileReader();r.onload=function(e){push(e.target.result)};r.readAsDataURL(f.files.item(0));}else push(null);
-};
-document.getElementById("bLimpar").onclick=function(){itens=[];render();};
-function parseHtml(h,cat,base){
-  var doc=new DOMParser().parseFromString(h,"text/html"),cards=doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item"),add=0,max=parseInt(document.getElementById("max").value)||30;
-  cards.forEach(function(el){
-    if(add>=max)return;
-    var t=el.querySelector(".js-item-name,.item-name,h2,h3,a[title]"),pr=el.querySelector(".js-price-display,.item-price,.price"),a=el.querySelector("a");
-    var nome=t?(t.getAttribute("title")||t.innerText).trim():"";if(!nome)return;
-    var link=a?a.getAttribute("href"):base;if(link&&link.indexOf("/")===0)link="https://simonelit.com"+link;
-    itens.push({n:nome,c:cat,p:pr?pr.innerText.trim().split("\n").shift():"",img:null,l:link});add++;
+  var f=document.getElementById("pImg");
+  if(!f.files||!f.files.length)return alert("Selecione pelo menos uma imagem.");
+  var c=document.getElementById("pCat").value.trim()||"Coleção";
+  var l=document.getElementById("pLink").value.trim()||document.getElementById("site").value.trim();
+  var arquivos=Array.from(f.files);
+  arquivos.forEach(function(file){
+    var r=new FileReader();
+    r.onload=function(e){
+      itens.push({c:c,img:e.target.result,l:l});
+      render();
+    };
+    r.readAsDataURL(file);
   });
-  if(!add){
-    var linhas=h.split("\n").map(function(x){return x.trim();}).filter(Boolean);
-    for(var i=1;i<linhas.length;i++){
-      if(add>=max)break;
-      var cur=linhas.slice(i,i+1).shift();
-      if(cur.indexOf("R$")===0&&cur!=="R$0,00"&&cur.indexOf("com Pix")===-1){
-        var prev=linhas.slice(i-1,i).shift();
-        if(prev.length>4&&prev.indexOf("R$")!==0&&prev!=="Frete grátis"&&prev!=="Incluindo..."){
-          var autoCat=prev.split(" ").shift();
-          itens.push({n:prev,c:autoCat||cat,p:cur,img:null,l:base});add++;
-        }
-      }
-    }
-  }
-  render();return add;
-}
-document.getElementById("bImp").onclick=async function(){
-  var u=document.getElementById("urlImp").value.trim(),c=document.getElementById("catImp").value.trim()||"Geral",m=document.getElementById("msgImp");
-  m.innerText="Tentando conectar a "+u+"...";
-  try{
-    var r=await fetch("https://allorigins.win"+encodeURIComponent(u));
-    var j=await r.json(),n=parseHtml(j.contents||"",c,u);
-    m.innerText=n?("✅ "+n+" itens importados!"):("⚠️ A Nuvemshop bloqueou o robô. Abra simonelit.com, aperte Ctrl+A -> Ctrl+C e cole na caixa abaixo!");
-  }catch(e){m.innerText="⚠️ Bloqueio de CORS do site. Use a caixa de colagem abaixo (Ctrl+A -> Ctrl+C na loja)!";}
+  f.value="";
 };
+
+document.getElementById("bLimpar").onclick=function(){itens=[];render();};
+
 document.getElementById("bColar").onclick=function(){
-  var txt=document.getElementById("txtImp").value.trim();if(!txt)return alert("Cole o texto da página da loja primeiro");
-  var n=parseHtml(txt,document.getElementById("catImp").value.trim()||"Geral",document.getElementById("site").value);
-  document.getElementById("msgImp").innerText=n?("✅ "+n+" produtos extraídos e separados por categoria!"):("❌ Nenhum produto encontrado.");
-  if(n)document.getElementById("txtImp").value="";
+  var h=document.getElementById("txtImp").value.trim();
+  if(!h)return alert("Cole o código-fonte (Ctrl+U) da página primeiro.");
+  var cat=document.getElementById("catColar").value.trim()||"Coleção";
+  var siteBase=document.getElementById("site").value.trim();
+  var doc=new DOMParser().parseFromString(h,"text/html");
+  var cards=doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item");
+  var add=0;
+  cards.forEach(function(el){
+    var i=el.querySelector("img"),a=el.querySelector("a");
+    if(!i)return;
+    var src=i.getAttribute("data-src")||i.getAttribute("src")||"";
+    if(src.indexOf("//")===0)src="https:"+src;
+    else if(src.indexOf("/")===0)src=siteBase+src;
+    var link=a?a.getAttribute("href"):siteBase;
+    if(link&&link.indexOf("/")===0)link=siteBase+link;
+    if(src){itens.push({c:cat,img:src,l:link});add++;}
+  });
+  document.getElementById("msgImp").innerText=add?("✅ "+add+" fotos com links extraídas!"):("❌ Cole o código-fonte (Ctrl+U) para capturar as imagens.");
+  if(add){document.getElementById("txtImp").value="";render();}
 };
+
+function carregarImgBase64(url){
+  if(!url)return Promise.resolve(null);
+  if(url.indexOf("data:image")===0)return Promise.resolve(url);
+  var proxy="https://weserv.nl"+encodeURIComponent(url.replace(/^https?:\/\//,""))+"&w=600&output=jpg";
+  return fetch(proxy).then(function(r){return r.ok?r.blob():null;}).then(function(b){
+    if(!b)return null;
+    return new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);});
+  }).catch(function(){return null;});
+}
+
+function hexRgb(hex){
+  var n=parseInt(hex.replace("#",""),16);
+  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+
 document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Adicione ou extraia itens primeiro");
-  var doc=new window.jspdf.jsPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
-  var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
-  var cols=parseInt(document.getElementById("col").value)||2,fnt=parseInt(document.getElementById("fnt").value)||11;
-  var porCat={};itens.forEach(function(it){if(!porCat[it.c])porCat[it.c]=[];porCat[it.c].push(it);});
-  var cats=Object.keys(porCat);
-  for(var cIdx=0;cIdx<cats.length;cIdx++){
-    if(cIdx>0)doc.addPage();
-    var cNome=cats.slice(cIdx,cIdx+1).shift();
-    var cw=(w-20-(cols-1)*6)/cols,ch=cols===1?110:75,ih=cols===1?75:45,col=0,y=22;
-    doc.setFillColor(30,41,59);doc.rect(10,8,w-20,10,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.text(loja.toUpperCase()+" • "+cNome.toUpperCase(),14,14.5);
-    var listaCat=porCat[cNome];
-    for(var i=0;i<listaCat.length;i++){
-      var it=listaCat.slice(i,i+1).shift();
-      if(y+ch>h-20){doc.addPage();y=15;col=0;}
-      var x=10+col*(cw+6);doc.setDrawColor(220);doc.rect(x,y,cw,ch);
-      if(it.img)try{doc.addImage(it.img,"JPEG",x+2,y+2,cw-4,ih);}catch(e){}
-      doc.link(x+2,y+2,cw-4,ih,{url:it.l||site});
-      doc.setTextColor(20);doc.setFontSize(fnt);doc.text(it.n.substring(0,26),x+3,y+ih+7);
-      doc.setTextColor(22,163,74);doc.text(it.p,x+3,y+ih+13);
-      col++;if(col>=cols){col=0;y+=ch+6;}
-    }
-    doc.setFillColor(30,41,59);doc.rect(w-88,h-15,38,8,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-69,h-9.5,{align:"center"});doc.link(w-88,h-15,38,8,{url:site});
-    doc.setFillColor(22,163,74);doc.rect(w-48,h-15,38,8,"F");doc.text("WHATSAPP",w-29,h-9.5,{align:"center"});doc.link(w-48,h-15,38,8,{url:wpp});
-  }
-  doc.save("Catalogo_"+loja.replace(/\s+/g,"_")+".pdf");
-};
-var st=document.getElementById("st");st.innerText="🟢 v9.0 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
-</script>
-</body>
-</html>
