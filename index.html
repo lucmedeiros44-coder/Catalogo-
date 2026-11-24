@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v12</title>
+<title>Lookbook PDF v13</title>
 <script src="https://cloudflare.com"></script>
 <style>
   *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
@@ -37,7 +37,7 @@
   </div>
   <div class="card" style="background:#eef2ff">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <span style="font-size:12px;color:#312e81"><b>1. Via Favorito:</b> Arraste o botão roxo para favoritos e clique nele dentro da loja:</span>
+      <span style="font-size:12px;color:#312e81"><b>1. Via Favorito:</b> Arraste para favoritos, role a loja para carregar fotos e clique nele:</span>
       <a id="bm" class="btn" style="background:#4f46e5" href="#">⚡ Capturar da Loja</a>
     </div>
     <textarea id="htmlIn" rows="2" placeholder="2. Ou cole aqui o código-fonte (Ctrl+U) da página da loja..."></textarea>
@@ -45,7 +45,7 @@
     <div id="msg" style="font-size:12px;font-weight:bold;margin-top:6px;color:#1e40af"></div>
   </div>
   <div class="card">
-    <label>Adicionar Foto(s) Manualmente</label>
+    <label>3. Adicionar Foto(s) do Aparelho/PC</label>
     <div class="g3" style="margin-bottom:8px">
       <input type="file" id="fImg" accept="image/*" multiple>
       <input id="fCat" placeholder="Categoria (ex: Vestidos)">
@@ -67,7 +67,7 @@ function render(){
   }).join("");
 }
 var baseUrl=location.href.split("?").shift().split("#").shift();
-document.getElementById("bm").href="javascript:(function(){var a=[],c=document.querySelectorAll('.js-item-product,.item-product,.product,.grid-item'),cat=document.title.split('-').shift().trim()||'Coleção';c.forEach(function(el){var i=el.querySelector('img'),lk=el.querySelector('a');if(i){var s=i.getAttribute('data-src')||i.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s)a.push({c:cat,img:s,l:lk?lk.href:location.href});}});if(!a.length)return alert('Nenhuma foto encontrada');window.name=JSON.stringify(a);location.href='"+baseUrl+"';})();";
+document.getElementById("bm").href="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a').forEach(function(lk){var card=lk.closest('div,li,article')||lk.parentElement;var img=card?card.querySelector('img'):null;if(img){var s=img.getAttribute('data-srcset')||img.getAttribute('srcset')||img.getAttribute('data-src')||img.src||'';s=s.split(',').pop().trim().split(' ').shift();if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('data:')!==0&&!seen[lk.href]){seen[lk.href]=1;a.push({c:'Coleção',img:s,l:lk.href});}}});if(!a.length)return alert('Role a página da loja até as fotos carregarem e clique novamente!');window.name=JSON.stringify(a);location.href='"+baseUrl+"';})();";
 try{if(window.name&&window.name.indexOf("[{")===0){itens=JSON.parse(window.name);window.name="";document.getElementById("msg").innerText="✅ "+itens.length+" fotos capturadas!";render();}}catch(e){}
 document.getElementById("bAdd").onclick=function(){
   var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha uma foto.");
@@ -78,14 +78,19 @@ document.getElementById("bAdd").onclick=function(){
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
 document.getElementById("bExtrair").onclick=function(){
   var h=document.getElementById("htmlIn").value.trim();if(!h)return alert("Cole o código-fonte primeiro.");
-  var site=document.getElementById("site").value.trim(),doc=new DOMParser().parseFromString(h,"text/html"),add=0;
-  doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item").forEach(function(el){
-    var i=el.querySelector("img"),a=el.querySelector("a");if(!i)return;
-    var s=i.getAttribute("data-src")||i.getAttribute("src")||"";if(s.indexOf("//")===0)s="https:"+s;else if(s.indexOf("/")===0)s=site+s;
-    var lk=a?a.getAttribute("href"):site;if(lk&&lk.indexOf("/")===0)lk=site+lk;
-    if(s){itens.push({c:"Coleção",img:s,l:lk});add++;}
+  var site=document.getElementById("site").value.trim(),doc=new DOMParser().parseFromString(h,"text/html"),add=0,seen={};
+  doc.querySelectorAll("a[href*='/produtos/'],a[href*='/produto/'],.js-item-product a").forEach(function(lk){
+    var card=lk.closest("div,li,article")||lk.parentElement;
+    var img=card?card.querySelector("img"):null;
+    if(!img)return;
+    var s=img.getAttribute("data-srcset")||img.getAttribute("srcset")||img.getAttribute("data-src")||img.getAttribute("src")||"";
+    s=s.split(",").pop().trim().split(" ").shift();
+    if(s.indexOf("//")===0)s="https:"+s;else if(s.indexOf("/")===0)s=site+s;
+    var href=lk.getAttribute("href")||site;
+    if(href.indexOf("/")===0)href=site+href;
+    if(s&&s.indexOf("data:")!==0&&!seen[href]){seen[href]=1;itens.push({c:"Coleção",img:s,l:href});add++;}
   });
-  document.getElementById("msg").innerText=add?("✅ "+add+" fotos extraídas!"):("❌ Nenhuma foto encontrada.");
+  document.getElementById("msg").innerText=add?("✅ "+add+" fotos com links capturadas!"):("❌ Nenhuma foto encontrada. Use a opção 3 abaixo.");
   if(add){document.getElementById("htmlIn").value="";render();}
 };
 function toB64(u){
@@ -123,7 +128,7 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v12 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v13 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
