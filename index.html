@@ -1,1 +1,164 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo Pro PDF</title>
+<script src="https://tailwindcss.com"></script>
+<script src="https://cloudflare.com"></script>
+<script src="https://cloudflare.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+<div id="telaLogin" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">PDF</div>
+    <h2 class="text-xl font-bold text-gray-900">Catálogo Pro PDF</h2>
+    <p class="text-xs text-gray-500 mb-4">Digite sua chave de acesso</p>
+    <input type="password" id="inputSenha" placeholder="Senha..." class="w-full border rounded-lg p-3 text-center font-semibold mb-3 outline-none">
+    <button onclick="verificarSenha()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg">Entrar</button>
+    <p id="erroSenha" class="text-xs text-red-600 font-semibold mt-2 hidden">Senha incorreta.</p>
+  </div>
+</div>
+
+<div id="painelApp" class="max-w-6xl mx-auto p-4 hidden">
+  <header class="bg-white p-4 rounded-xl shadow-sm mb-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-lg font-bold text-gray-900">Catálogo Pro PDF</h1>
+      <p class="text-xs text-gray-500">Moda • Óticas • Restaurantes</p>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="gerarPDF()" class="bg-green-600 text-white font-bold py-2.5 px-4 rounded-lg text-sm">📄 BAIXAR PDF</button>
+      <button onclick="sairApp()" class="bg-gray-200 text-gray-700 font-semibold py-2.5 px-3 rounded-lg text-xs">Sair</button>
+    </div>
+  </header>
+
+  <section class="bg-white p-4 rounded-xl shadow-sm mb-4 border-l-4 border-blue-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1">1. NOME DA LOJA</label>
+      <input type="text" id="nomeLoja" value="Loja Simone Lit" class="w-full border rounded p-2 text-sm">
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1">2. LINK DO SITE</label>
+      <input type="url" id="linkSite" value="https://simonelit.com" class="w-full border rounded p-2 text-sm">
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1">3. NÚMERO WHATSAPP</label>
+      <input type="text" id="numWhatsapp" value="553132843022" class="w-full border rounded p-2 text-sm">
+    </div>
+    <div>
+      <label class="block text-xs font-bold text-gray-700 mb-1">4. TOTAL DE PRODUTOS</label>
+      <input type="number" id="totalProdutos" value="12" min="1" max="300" class="w-full border rounded p-2 text-sm">
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <div class="lg:col-span-5 space-y-4">
+      <div class="bg-white p-4 rounded-xl shadow-sm">
+        <h2 class="font-bold text-sm mb-2 border-b pb-1">Perfil Rápido (Nicho)</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="carregarNicho('moda')" class="py-2 rounded border text-xs font-bold bg-pink-50 border-pink-400 text-pink-700">👗 Moda</button>
+          <button onclick="carregarNicho('otica')" class="py-2 rounded border text-xs font-bold">👓 Ótica</button>
+          <button onclick="carregarNicho('restaurante')" class="py-2 rounded border text-xs font-bold">🍽️ Restaurante</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
+        <h2 class="font-bold text-sm border-b pb-1">Capa, Logo e Grade</h2>
+        <input type="file" id="logoLoja" accept="image/*" onchange="carregarLogo(event)" class="text-xs w-full">
+        <div class="flex items-center justify-between gap-2 bg-gray-50 p-2 rounded border">
+          <label class="flex items-center gap-1 text-xs font-bold"><input type="checkbox" id="incluirCapa" checked> Capa</label>
+          <input type="text" id="tituloCapa" value="COLEÇÃO ATUAL" class="border rounded p-1 text-xs w-40">
+        </div>
+        <select id="tipoGrade" class="w-full border rounded p-2 text-sm bg-white">
+          <option value="1">1 Produto Grande por Página</option>
+          <option value="2" selected>2 Produtos por Linha (Padrão)</option>
+          <option value="3">3 Produtos por Linha (Compacto)</option>
+        </select>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
+        <h2 class="font-bold text-sm border-b pb-1">Cores, Fontes e Rodapé</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <div><label class="text-xs font-bold">Cor</label><input type="color" id="corPrincipal" value="#1e293b" class="w-full h-8 border rounded"></div>
+          <div><label class="text-xs font-bold">Fonte</label><input type="number" id="tamanhoFonte" value="11" class="w-full border rounded p-1.5 text-sm"></div>
+          <div><label class="text-xs font-bold">Linha</label><input type="number" id="alturaLinha" value="1.3" step="0.1" class="w-full border rounded p-1.5 text-sm"></div>
+        </div>
+        <input type="text" id="textoRodape" value="Toque nas fotos para comprar no site ou peça pelo WhatsApp" class="w-full border rounded p-2 text-xs">
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <label><input type="checkbox" id="attrPreco" checked> Preço</label>
+          <label><input type="checkbox" id="attrSku" checked> Ref/SKU</label>
+          <label><input type="checkbox" id="attrSpecs" checked> Tamanhos</label>
+          <label><input type="checkbox" id="attrQr" checked> QR Code</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7 space-y-4">
+      <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
+        <h2 class="font-bold text-sm text-indigo-900 mb-2">🚀 Extrair Direto do Site</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+          <input type="url" id="urlExtracao" value="https://simonelit.com" class="sm:col-span-6 bg-white border rounded p-2 text-sm">
+          <input type="number" id="itensPorCat" value="3" min="1" max="15" title="Itens por categoria" class="sm:col-span-2 bg-white border rounded p-2 text-sm text-center">
+          <button onclick="extrairMultiCategorias()" id="btnExtrairMulti" class="sm:col-span-4 bg-indigo-600 text-white font-bold py-2 px-3 rounded text-xs">Extrair Catálogo</button>
+        </div>
+        <div id="statusExtracao" class="text-xs font-medium mt-2 hidden"></div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm space-y-2">
+        <h2 class="font-bold text-sm border-b pb-1">Adicionar Item Manualmente</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <input type="text" id="prodNome" placeholder="Nome" class="border rounded p-2 text-xs">
+          <input type="text" id="prodCat" placeholder="Categoria" class="border rounded p-2 text-xs">
+          <input type="text" id="prodPreco" placeholder="R$ 0,00" class="border rounded p-2 text-xs">
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <input type="text" id="prodSku" placeholder="Ref/SKU" class="border rounded p-2 text-xs">
+          <input type="text" id="prodSpecs" placeholder="Detalhes" class="border rounded p-2 text-xs">
+          <input type="url" id="prodLink" placeholder="Link" class="border rounded p-2 text-xs">
+        </div>
+        <div class="flex gap-2 items-center">
+          <input type="file" id="prodImagem" accept="image/*" class="text-xs w-full">
+          <button onclick="adicionarProduto()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded text-xs shrink-0">+ Add</button>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm">
+        <div class="flex justify-between items-center border-b pb-1 mb-2">
+          <h2 class="font-bold text-sm">Itens (<span id="contadorItens">0</span>)</h2>
+          <button onclick="produtos=[];renderizarLista()" class="text-xs text-red-600">Limpar</button>
+        </div>
+        <div id="listaProdutos" class="space-y-2 max-h-80 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SENHA_MESTRA = "vip2026";
+const IMG_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABmJLR0QA/wD/AP+gvaeTAAABJElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcAz0AAAd654/gAAAAASUVORK5CYII=";
+let logoBase64 = null;
+let produtos = [];
+
+function verificarSenha() {
+  if (document.getElementById('inputSenha').value === SENHA_MESTRA) {
+    localStorage.setItem('catalogo_pro_auth', 'ok');
+    liberarPainel();
+  } else {
+    document.getElementById('erroSenha').classList.remove('hidden');
+  }
+}
+function liberarPainel() {
+  document.getElementById('telaLogin').classList.add('hidden');
+  document.getElementById('painelApp').classList.remove('hidden');
+}
+function sairApp() {
+  localStorage.removeItem('catalogo_pro_auth');
+  location.reload();
+}
+if (localStorage.getItem('catalogo_pro_auth') === 'ok') liberarPainel();
+
+const presets = {
+  moda: { loja: "Loja Simone Lit", subtitulo: "COLEÇÃO ATUAL", cor: "#1e293b", itens: [] },
+  otica: { loja: "Ótica Visão Clara", subtitulo: "ARMAÇÕES E SOLAR", cor: "#0284c7", itens: [{ nome: "Armação Acetato", categoria: "Grau", preco: "R$ 340,00", sku: "OTC-01", specs: "Aro 52 | Ponte 17", link: "https://sualoja.com.br", imagem: IMG_PLACEHOLDER }] },
