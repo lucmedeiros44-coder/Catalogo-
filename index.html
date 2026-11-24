@@ -39,13 +39,55 @@
     <h2 style="margin:0 0 6px 0;">Catálogo Pro PDF</h2>
     <p style="font-size:12px; color:#6b7280; margin:0 0 16px 0;">Digite sua chave de acesso</p>
     <div style="position:relative; margin-bottom:12px;">
-      <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; padding-right:40px;" onkeyup="if(event.key==='Enter') entrar()">
-      <button type="button" onclick="toggleSenha()" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; padding:4px; font-size:14px;">👁️</button>
+      <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; padding-right:40px;">
+      <button type="button" id="btnOlho" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; padding:4px; font-size:14px;">👁️</button>
     </div>
-    <button type="button" onclick="entrar()" class="btn-blue" style="width:100%; padding:12px;">Entrar no Gerador</button>
+    <button type="button" id="btnEntrar" class="btn-blue" style="width:100%; padding:12px;">Entrar no Gerador</button>
     <p id="erroSenha" class="hidden" style="color:#dc2626; font-size:12px; margin-top:8px;">Senha incorreta.</p>
   </div>
 </div>
+
+<!-- SCRIPT DE LOGIN ISOLADO PARA NUNCA TRAVAR -->
+<script>
+  (function() {
+    var telaLogin = document.getElementById("telaLogin");
+    var painelApp = null;
+
+    function abrirPainel() {
+      painelApp = document.getElementById("painelApp");
+      if (telaLogin) telaLogin.style.display = "none";
+      if (painelApp) {
+        painelApp.classList.remove("hidden");
+        painelApp.style.display = "block";
+      }
+    }
+
+    if (sessionStorage.getItem("catalogo_auth") === "true") {
+      window.addEventListener("DOMContentLoaded", abrirPainel);
+    }
+
+    document.getElementById("btnOlho").addEventListener("click", function() {
+      var inp = document.getElementById("inputSenha");
+      inp.type = inp.type === "password" ? "text" : "password";
+    });
+
+    function validarLogin() {
+      var val = document.getElementById("inputSenha").value.trim().toLowerCase();
+      if (val === "vip2026") {
+        sessionStorage.setItem("catalogo_auth", "true");
+        document.getElementById("erroSenha").classList.add("hidden");
+        abrirPainel();
+      } else {
+        document.getElementById("erroSenha").classList.remove("hidden");
+      }
+    }
+
+    document.getElementById("btnEntrar").addEventListener("click", validarLogin);
+    document.getElementById("inputSenha").addEventListener("keyup", function(e) {
+      if (e.key === "Enter") validarLogin();
+    });
+  })();
+</script>
 
 <div id="painelApp" class="container hidden">
   <div class="card header">
@@ -155,43 +197,3 @@
       </div>
 
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <label style="margin:0;">Itens no Catálogo (<span id="contagemItens">0</span>)</label>
-          <button type="button" onclick="limparLista()" class="btn-red">Limpar Tudo</button>
-        </div>
-        <div id="listaItens" style="max-height: 320px; overflow-y: auto;"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="qrTemp" style="display:none;"></div>
-
-<script>
-  const SENHA_MESTRA = "vip2026";
-  let logoBase64 = null;
-  let produtos = [];
-
-  if (sessionStorage.getItem("catalogo_auth") === "true") {
-    mostrarPainel();
-  }
-
-  function toggleSenha() {
-    const inp = document.getElementById("inputSenha");
-    inp.type = inp.type === "password" ? "text" : "password";
-  }
-
-  function entrar() {
-    const val = document.getElementById("inputSenha").value.trim().toLowerCase();
-    if (val === SENHA_MESTRA) {
-      sessionStorage.setItem("catalogo_auth", "true");
-      document.getElementById("erroSenha").classList.add("hidden");
-      mostrarPainel();
-    } else {
-      document.getElementById("erroSenha").classList.remove("hidden");
-    }
-  }
-
-  function sair() {
-    sessionStorage.removeItem("catalogo_auth");
-    document.getElementById("painelApp").classList.add("hidden");
