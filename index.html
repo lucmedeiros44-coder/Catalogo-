@@ -3,14 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF</title>
+<title>Catálogo Pro PDF v4.0</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
   * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   body { margin: 0; background: #f3f4f6; color: #1f2937; }
-  .login-box { min-height: 100vh; background: #0f172a; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .login-card { background: #fff; padding: 24px; border-radius: 16px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
   .container { max-width: 1100px; margin: 0 auto; padding: 14px; }
   .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
   .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
@@ -18,10 +16,11 @@
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
-  input[type="text"], input[type="url"], input[type="number"], input[type="password"], select {
+  input[type="text"], input[type="url"], input[type="number"], select {
     width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
   }
   button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
   .btn-blue { background: #2563eb; color: #fff; }
   .btn-green { background: #16a34a; color: #fff; }
   .btn-indigo { background: #4f46e5; color: #fff; }
@@ -29,75 +28,19 @@
   .btn-red { background: #fee2e2; color: #dc2626; padding: 4px 8px; font-size: 11px; }
   .hidden { display: none !important; }
   .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; gap: 8px; }
-  .item-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #e5e7eb; }
+  .item-thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 6px; background: #e5e7eb; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
-<div id="telaLogin" class="login-box">
-  <div class="login-card">
-    <h2 style="margin:0 0 6px 0;">Catálogo Pro PDF</h2>
-    <p style="font-size:12px; color:#6b7280; margin:0 0 16px 0;">Digite sua chave de acesso</p>
-    <div style="position:relative; margin-bottom:12px;">
-      <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; padding-right:40px;">
-      <button type="button" id="btnOlho" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; padding:4px; font-size:14px;">👁️</button>
-    </div>
-    <button type="button" id="btnEntrar" class="btn-blue" style="width:100%; padding:12px;">Entrar no Gerador</button>
-    <p id="erroSenha" class="hidden" style="color:#dc2626; font-size:12px; margin-top:8px;">Senha incorreta.</p>
-  </div>
-</div>
-
-<!-- SCRIPT DE LOGIN ISOLADO PARA NUNCA TRAVAR -->
-<script>
-  (function() {
-    var telaLogin = document.getElementById("telaLogin");
-    var painelApp = null;
-
-    function abrirPainel() {
-      painelApp = document.getElementById("painelApp");
-      if (telaLogin) telaLogin.style.display = "none";
-      if (painelApp) {
-        painelApp.classList.remove("hidden");
-        painelApp.style.display = "block";
-      }
-    }
-
-    if (sessionStorage.getItem("catalogo_auth") === "true") {
-      window.addEventListener("DOMContentLoaded", abrirPainel);
-    }
-
-    document.getElementById("btnOlho").addEventListener("click", function() {
-      var inp = document.getElementById("inputSenha");
-      inp.type = inp.type === "password" ? "text" : "password";
-    });
-
-    function validarLogin() {
-      var val = document.getElementById("inputSenha").value.trim().toLowerCase();
-      if (val === "vip2026") {
-        sessionStorage.setItem("catalogo_auth", "true");
-        document.getElementById("erroSenha").classList.add("hidden");
-        abrirPainel();
-      } else {
-        document.getElementById("erroSenha").classList.remove("hidden");
-      }
-    }
-
-    document.getElementById("btnEntrar").addEventListener("click", validarLogin);
-    document.getElementById("inputSenha").addEventListener("keyup", function(e) {
-      if (e.key === "Enter") validarLogin();
-    });
-  })();
-</script>
-
-<div id="painelApp" class="container hidden">
+<div id="painelApp" class="container">
   <div class="card header">
     <div>
-      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF</h1>
+      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span style="font-size:11px; background:#dbeafe; color:#1d4ed8; padding:2px 6px; border-radius:6px;">v4.0 Auto-Imagens</span></h1>
       <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
     <div style="display:flex; gap:8px;">
       <button type="button" onclick="gerarPDF()" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
-      <button type="button" onclick="sair()" class="btn-gray">Sair</button>
     </div>
   </div>
 
@@ -109,7 +52,7 @@
       </div>
       <div>
         <label>2. LINK DO SITE</label>
-        <input type="url" id="linkSite" value="https://simonelit.com">
+        <input type="url" id="linkSite" value="https://simonelit.com.br">
       </div>
       <div>
         <label>3. NÚMERO WHATSAPP</label>
@@ -169,12 +112,13 @@
 
     <div>
       <div class="card" style="background:#eef2ff; border:1px solid #c7d2fe;">
-        <label style="color:#312e81;">🚀 Extrair Direto do Site da Loja</label>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <input type="url" id="urlExtracao" value="https://simonelit.com" style="flex:2; min-width:160px;">
-          <input type="number" id="itensPorCat" value="3" min="1" max="15" style="width:60px; text-align:center;" title="Itens por categoria">
-          <button type="button" onclick="extrairSite()" id="btnExtrair" class="btn-indigo">Extrair Catálogo</button>
+        <label style="color:#312e81;">🚀 Extrair Direto do Site (ou URL de Categoria)</label>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+          <input type="url" id="urlExtracao" value="https://simonelit.com.br" style="flex:2; min-width:160px;">
+          <input type="text" id="catExtracao" value="Destaques" placeholder="Nome da Categoria" style="flex:1; min-width:110px;">
+          <button type="button" onclick="extrairSite()" id="btnExtrair" class="btn-indigo">Importar</button>
         </div>
+        <span style="font-size:11px; color:#4338ca;">Dica: Cole o link de uma categoria específica (ex: /vestido) para separar por páginas.</span>
         <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
       </div>
 
@@ -197,3 +141,54 @@
       </div>
 
       <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="margin:0;">Itens no Catálogo (<span id="contagemItens">0</span>)</label>
+          <button type="button" onclick="limparLista()" class="btn-red">Limpar Tudo</button>
+        </div>
+        <div id="listaItens" style="max-height: 320px; overflow-y: auto;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="qrTemp" style="display:none;"></div>
+
+<script>
+  var logoBase64 = null;
+  var produtos = [];
+
+  function setNicho(nicho) {
+    if (nicho === "moda") {
+      document.getElementById("tituloCapa").value = "NOVA COLEÇÃO";
+      document.getElementById("prodSpecs").placeholder = "Tamanhos (P, M, G)";
+      document.getElementById("corPrincipal").value = "#1e293b";
+    } else if (nicho === "otica") {
+      document.getElementById("tituloCapa").value = "CATÁLOGO DE ARMAÇÕES";
+      document.getElementById("prodSpecs").placeholder = "Material / Aro / Cor";
+      document.getElementById("corPrincipal").value = "#0369a1";
+    } else if (nicho === "restaurante") {
+      document.getElementById("tituloCapa").value = "CARDÁPIO DIGITAL";
+      document.getElementById("prodSpecs").placeholder = "Ingredientes / Porção";
+      document.getElementById("corPrincipal").value = "#b91c1c";
+    }
+  }
+
+  function lerLogo(event) {
+    var listaArquivos = event.target.files;
+    if (!listaArquivos || listaArquivos.length === 0) return;
+    var reader = new FileReader();
+    reader.onload = function(e) { logoBase64 = e.target.result; };
+    reader.readAsDataURL(listaArquivos.item(0));
+  }
+
+  function addManual() {
+    var nome = document.getElementById("prodNome").value.trim();
+    if (!nome) return alert("Digite o nome do produto.");
+
+    var cat = document.getElementById("prodCat").value.trim() || "Geral";
+    var preco = document.getElementById("prodPreco").value.trim() || "";
+    var sku = document.getElementById("prodSku").value.trim() || "";
+    var specs = document.getElementById("prodSpecs").value.trim() || "";
+    var link = document.getElementById("prodLink").value.trim() || document.getElementById("linkSite").value.trim();
+    var fileInput = document.getElementById("prodImagem");
+
