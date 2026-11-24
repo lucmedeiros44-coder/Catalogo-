@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v16</title>
-<script src="https://cloudflare.com"></script>
+<title>Lookbook PDF v17</title>
+<script src="https://jsdelivr.net"></script>
 <style>
   *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
   .box{max-width:960px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -37,13 +37,11 @@
   </div>
   <div class="card" style="background:#eef2ff;border:1px solid #c7d2fe">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <div style="font-size:12px;color:#312e81;flex:1">
-        <b>1. Captura Inteligente (Apenas 1ª Foto):</b> Arraste o botão roxo para favoritos, abra a loja, role a tela e clique nele!
-      </div>
+      <div style="font-size:12px;color:#312e81;flex:1"><b>1. Captura Inteligente (1ª Foto):</b> Arraste o botão roxo para favoritos, role a loja e clique nele!</div>
       <a id="bm" class="btn" style="background:#4f46e5" href="#">⚡ Capturar 1ª Foto</a>
     </div>
     <div style="display:flex;gap:6px;margin-top:8px">
-      <input id="linkDiretoImg" placeholder="2. Ou cole o link da foto (Copiar endereço da imagem)...">
+      <input id="linkDiretoImg" placeholder="2. Ou cole o link da foto...">
       <input id="linkDiretoProd" placeholder="Link do produto (opcional)">
       <button id="bAddUrl" style="background:#2563eb;white-space:nowrap">+ Add Link</button>
     </div>
@@ -72,7 +70,7 @@ function render(){
   }).join("");
 }
 var baseUrl=location.href.split("?").shift().split("#").shift();
-var code="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a,a img').forEach(function(el){var lk=el.tagName==='A'?el:el.closest('a');if(!lk||!lk.href||lk.href.indexOf('http')!==0)return;var h=lk.href.split('?').shift().split('#').shift();if(seen[h])return;var card=lk.closest('.js-item-product,.item-product,.product,.grid-item')||lk;var imgs=card.querySelectorAll('img');for(var k=0;k<imgs.length;k++){var img=imgs[k];var w=img.naturalWidth||img.width||0;if(w<120)continue;var s=img.currentSrc||img.getAttribute('data-src')||img.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('http')===0){seen[h]=1;a.push({i:s,l:h});break;}}});if(!a.length)return alert('Role a página para carregar as fotos e tente novamente!');location.href='"+baseUrl+"#d='+encodeURIComponent(JSON.stringify(a.slice(0,40)));})();";
+var code="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a,a img').forEach(function(el){var lk=el.tagName==='A'?el:el.closest('a');if(!lk||!lk.href||lk.href.indexOf('http')!==0)return;var h=lk.href.split('?').shift().split('#').shift();if(seen[h])return;var card=lk.closest('.js-item-product,.item-product,.product,.grid-item')||lk;var imgs=card.querySelectorAll('img');for(var k=0;k<imgs.length;k++){var img=imgs.item(k);var w=img.naturalWidth||img.width||0;if(w<120)continue;var s=img.currentSrc||img.getAttribute('data-src')||img.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('http')===0){seen[h]=1;a.push({i:s,l:h});break;}}});if(!a.length)return alert('Role a página para carregar as fotos e tente novamente!');location.href='"+baseUrl+"#d='+encodeURIComponent(JSON.stringify(a.slice(0,40)));})();";
 document.getElementById("bm").href=code;
 try{
   if(location.hash&&location.hash.indexOf("#d=")===0){
@@ -104,11 +102,102 @@ function toB64(u){
       if(!b)return null;return new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);});
     }).catch(function(){return null;});
 }
+function garantirJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
+  if(window.jsPDF)return Promise.resolve(window.jsPDF);
+  return new Promise(function(resolve,reject){
+    var s=document.createElement("script");
+    s.src="https://unpkg.com";
+    s.onload=function(){resolve((window.jspdf&&window.jspdf.jsPDF)||window.jsPDF);};
+    s.onerror=function(){reject(new Error("Falha ao baixar biblioteca PDF. Verifique sua conexão."));};
+    document.head.appendChild(s);
+  });
+}
 document.getElementById("bPdf").onclick=async function(){
   if(!itens.length)return alert("Adicione fotos primeiro.");
   var btn=this;btn.innerText="Gerando...";btn.disabled=true;
   try{
-    var doc=new window.jspdf.jsPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+    var CtorPDF=await garantirJsPDF();
+    if(!CtorPDF)throw new Error("Biblioteca PDF indisponível no momento.");
+    var doc=new CtorPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
+    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+    var cols=parseInt(document.getElementById("col").value)||2,rod=document.getElementById("rod").value;
+    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
+    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
+    var rodape=function(){
+      doc.setFontSize(8);doc.setTextColor(90);doc.text(rod,10,h-12);
+      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
+      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
+    };
+    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
+    for(var i=0;i<itens.length;i++){
+      var it=itens.slice(i,i+1).shift();
+      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
+      var x=m+col*(cw+gap),b64=await toB64(it.img);
+      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
+      doc.link(x,y,cw,ch,{url:it.l||site});
+      col++;if(col>=cols){col=0;y+=ch+gap;}
+    }
+<script>
+var itens=[];
+function render(){
+  document.getElementById("qtd").innerText=itens.length;
+  document.getElementById("grid").innerHTML=itens.map(function(it,i){
+    return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';
+  }).join("");
+}
+var baseUrl=location.href.split("?").shift().split("#").shift();
+var code="javascript:(function(){var a=[],seen={};document.querySelectorAll('a[href*=\"/produtos/\"],a[href*=\"/produto/\"],.js-item-product a,a img').forEach(function(el){var lk=el.tagName==='A'?el:el.closest('a');if(!lk||!lk.href||lk.href.indexOf('http')!==0)return;var h=lk.href.split('?').shift().split('#').shift();if(seen[h])return;var card=lk.closest('.js-item-product,.item-product,.product,.grid-item')||lk;var imgs=card.querySelectorAll('img');for(var k=0;k<imgs.length;k++){var img=imgs.item(k);var w=img.naturalWidth||img.width||0;if(w<120)continue;var s=img.currentSrc||img.getAttribute('data-src')||img.src||'';if(s.indexOf('//')===0)s='https:'+s;if(s&&s.indexOf('http')===0){seen[h]=1;a.push({i:s,l:h});break;}}});if(!a.length)return alert('Role a página para carregar as fotos e tente novamente!');location.href='"+baseUrl+"#d='+encodeURIComponent(JSON.stringify(a.slice(0,40)));})();";
+document.getElementById("bm").href=code;
+try{
+  if(location.hash&&location.hash.indexOf("#d=")===0){
+    var arr=JSON.parse(decodeURIComponent(location.hash.substring(3)));
+    if(Array.isArray(arr)&&arr.length){
+      itens=arr.map(function(x){return {c:"Coleção",img:x.i,l:x.l};});
+      history.replaceState(null,"",baseUrl);
+      document.getElementById("msg").innerText="✅ "+itens.length+" produtos capturados!";
+      render();
+    }
+  }
+}catch(e){}
+document.getElementById("bAddUrl").onclick=function(){
+  var u=document.getElementById("linkDiretoImg").value.trim();if(!u)return alert("Cole o endereço da imagem.");
+  var p=document.getElementById("linkDiretoProd").value.trim()||document.getElementById("site").value;
+  itens.push({c:"Coleção",img:u,l:p});document.getElementById("linkDiretoImg").value="";document.getElementById("linkDiretoProd").value="";render();
+};
+document.getElementById("bAdd").onclick=function(){
+  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha uma foto.");
+  var c=document.getElementById("fCat").value.trim()||"Coleção",l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
+  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({c:c,img:e.target.result,l:l});render();};r.readAsDataURL(file);});
+  f.value="";
+};
+document.getElementById("bLimpar").onclick=function(){itens=[];render();};
+function toB64(u){
+  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
+  return fetch("https://weserv.nl"+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
+    .then(function(r){return r.ok?r.blob():null;}).then(function(b){
+      if(!b)return null;return new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);});
+    }).catch(function(){return null;});
+}
+function garantirJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
+  if(window.jsPDF)return Promise.resolve(window.jsPDF);
+  return new Promise(function(resolve,reject){
+    var s=document.createElement("script");
+    s.src="https://unpkg.com";
+    s.onload=function(){resolve((window.jspdf&&window.jspdf.jsPDF)||window.jsPDF);};
+    s.onerror=function(){reject(new Error("Falha ao baixar biblioteca PDF."));};
+    document.head.appendChild(s);
+  });
+}
+document.getElementById("bPdf").onclick=async function(){
+  if(!itens.length)return alert("Adicione fotos primeiro.");
+  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
+  try{
+    var CtorPDF=await garantirJsPDF();
+    if(!CtorPDF)throw new Error("Biblioteca PDF indisponível.");
+    var doc=new CtorPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
     var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
     var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
     var cols=parseInt(document.getElementById("col").value)||2,rod=document.getElementById("rod").value;
@@ -132,8 +221,7 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v16 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v17 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
-
