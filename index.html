@@ -1,360 +1,55 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF</title>
-<style>
-  *{box-sizing:border-box;font-family:sans-serif}
-  body{margin:0;background:#f3f4f6;color:#1f2937}
-  .box{max-width:900px;margin:0 auto;padding:12px}
-  .card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
-  .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-  input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-  button{cursor:pointer;border:0;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-  button:disabled{opacity:.6;cursor:not-allowed}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
-  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#fff;border:1px solid #e5e7eb}
-  .item img{width:100%;height:100%;object-fit:contain}
-  .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
-  @media(max-width:600px){
-    .g3{grid-template-columns:1fr}
-    .card:first-child{gap:8px;align-items:flex-start!important;flex-direction:column}
-  }
-</style>
-</head>
-<body>
-<div class="box">
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <b style="font-size:18px">Lookbook PDF</b>
-      <span id="st" style="font-size:11px;background:#fef3c7;color:#b45309;padding:3px 7px;border-radius:6px">🟡 Carregando jsPDF...</span>
-    </div>
-    <button id="bPdf" style="background:#16a34a" disabled>📄 BAIXAR PDF</button>
-  </div>
-
-  <div class="card g3">
-    <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
-    <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
-    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
-  </div>
-
-  <div class="card g3">
-    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
-    <div>
-      <label>Fotos/Linha</label>
-      <select id="col">
-        <option value="1">1 Grande</option>
-        <option value="2" selected>2 Padrão</option>
-        <option value="3">3 Compacto</option>
-      </select>
-    </div>
-    <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
-  </div>
-
-  <div class="card">
-    <label>Adicionar Foto(s) + Link do Produto</label>
-    <div class="g3" style="margin-bottom:8px">
-      <input type="file" id="fImg" accept="image/*" multiple>
-      <input id="fLink" placeholder="Link do produto no site">
-      <button id="bAdd" style="background:#2563eb">+ Adicionar</button>
-    </div>
-    <div style="display:flex;gap:6px">
-      <input id="uImg" placeholder="Ou cole o link direto da foto">
-      <button id="bUrl" style="background:#4f46e5;white-space:nowrap">+ Link Foto</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <label>Fotos (<span id="qtd">0</span>)</label>
-      <button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button>
-    </div>
-    <div id="grid" class="grid"></div>
-  </div>
-</div>
-
-<script>
-(function(){
-  var st = document.getElementById("st");
-  var btnPdf = document.getElementById("bPdf");
-  var itens = [];
-
-  function setStatus(text, ok){
-    st.textContent = text;
-    st.style.background = ok ? "#dcfce7" : "#fee2e2";
-    st.style.color = ok ? "#15803d" : "#dc2626";
-  }
-
-  // Carrega a biblioteca jsPDF.
-  var sc = document.createElement("script");
-  sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-  sc.onload = function(){
-    if(window.jspdf && window.jspdf.jsPDF){
-      setStatus("🟢 jsPDF pronto", true);
-      btnPdf.disabled = false;
-    } else {
-      setStatus("🔴 jsPDF carregou, mas não foi encontrado", false);
+{
+  "store_name": "Loja Aurora",
+  "store_url": "www.lojaaurora.com.br",
+  "whatsapp_number": "5511987654321",
+  "whatsapp_display": "+55 11 98765-4321",
+  "catalog_date": "2025-01-15",
+  "categories": [
+    {
+      "name": "Calçados",
+      "products": [
+        {
+          "name": "Tênis Urban Run",
+          "price": 249.9,
+          "link": "www.lojaaurora.com.br/tenis-urban-run",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3ETenis Urban%3C/text%3E%3C/svg%3E"
+        },
+        {
+          "name": "Sandália Conforto",
+          "price": 129.9,
+          "link": "www.lojaaurora.com.br/sandalia-conforto",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3ESandalia%3C/text%3E%3C/svg%3E"
+        },
+        {
+          "name": "Bota Couro Classic",
+          "price": 389.0,
+          "link": "www.lojaaurora.com.br/bota-couro",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3EBota%3C/text%3E%3C/svg%3E"
+        }
+      ]
+    },
+    {
+      "name": "Acessórios",
+      "products": [
+        {
+          "name": "Mochila Viagem 30L",
+          "price": 199.9,
+          "link": "www.lojaaurora.com.br/mochila-viagem",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3EMochila%3C/text%3E%3C/svg%3E"
+        },
+        {
+          "name": "Boné Aba Curva",
+          "price": 79.9,
+          "link": "www.lojaaurora.com.br/bone-aba-curva",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3EBone%3C/text%3E%3C/svg%3E"
+        },
+        {
+          "name": "Carteira Slim",
+          "price": 99.0,
+          "link": "www.lojaaurora.com.br/carteira-slim",
+          "image_url": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect width='300' height='200' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%2394a3b8' font-size='16' font-family='sans-serif'%3ECarteira%3C/text%3E%3C/svg%3E"
+        }
+      ]
     }
-  };
-  sc.onerror = function(){
-    setStatus("🔴 Falha ao carregar jsPDF. Verifique a conexão.", false);
-  };
-  document.head.appendChild(sc);
-
-  function normalizarUrl(valor, fallback){
-    var v = (valor || "").trim() || (fallback || "").trim();
-    if(!v) return "";
-    if(!/^https?:\/\//i.test(v)) v = "https://" + v;
-    try {
-      return new URL(v).href;
-    } catch(e) {
-      return "";
-    }
-  }
-
-  function render(){
-    var grid = document.getElementById("grid");
-    document.getElementById("qtd").textContent = itens.length;
-    grid.replaceChildren();
-
-    itens.forEach(function(it, i){
-      var card = document.createElement("div");
-      card.className = "item";
-
-      var img = document.createElement("img");
-      img.src = it.img;
-      img.alt = "Foto do produto " + (i + 1);
-
-      var del = document.createElement("button");
-      del.className = "del";
-      del.type = "button";
-      del.textContent = "✕";
-      del.setAttribute("aria-label", "Remover foto");
-      del.onclick = function(){
-        itens.splice(i, 1);
-        render();
-      };
-
-      card.append(img, del);
-      grid.appendChild(card);
-    });
-  }
-
-  document.getElementById("bAdd").onclick = function(){
-    var input = document.getElementById("fImg");
-    if(!input.files || !input.files.length) return alert("Escolha foto(s).");
-
-    var lojaUrl = normalizarUrl(document.getElementById("site").value);
-    var link = normalizarUrl(document.getElementById("fLink").value, lojaUrl);
-
-    Array.from(input.files).forEach(function(file){
-      if(!file.type || file.type.indexOf("image/") !== 0) return;
-
-      var reader = new FileReader();
-      reader.onload = function(e){
-        itens.push({img:e.target.result, l:link || lojaUrl});
-        render();
-      };
-      reader.onerror = function(){
-        alert("Não foi possível ler o arquivo " + file.name + ".");
-      };
-      reader.readAsDataURL(file);
-    });
-
-    input.value = "";
-  };
-
-  document.getElementById("bUrl").onclick = function(){
-    var urlFoto = document.getElementById("uImg").value.trim();
-    if(!urlFoto) return alert("Cole o link da foto.");
-
-    var imgUrl = normalizarUrl(urlFoto);
-    if(!imgUrl) return alert("O link da foto não parece válido.");
-
-    var site = normalizarUrl(document.getElementById("site").value);
-    var link = normalizarUrl(document.getElementById("fLink").value, site);
-
-    itens.push({img:imgUrl, l:link || site});
-    document.getElementById("uImg").value = "";
-    render();
-  };
-
-  document.getElementById("bLimpar").onclick = function(){
-    itens = [];
-    render();
-  };
-
-  // Ajusta a foto inteira em uma área branca, sem cortes nem distorção.
-  function processarImagem(url, targetRatio){
-    return new Promise(function(resolve){
-      var src = url;
-
-      if(url && url.indexOf("data:image/") !== 0){
-        src = "https://images.weserv.nl/?url=" +
-          encodeURIComponent(url) + "&w=1200&output=jpg";
-      }
-
-      var img = new Image();
-      img.crossOrigin = "anonymous";
-
-      img.onload = function(){
-        var iw = img.naturalWidth || img.width;
-        var ih = img.naturalHeight || img.height;
-        if(!iw || !ih) return resolve(null);
-
-        var canvas = document.createElement("canvas");
-        canvas.width = 1000;
-        canvas.height = Math.max(1, Math.round(1000 / targetRatio));
-
-        var ctx = canvas.getContext("2d");
-        if(!ctx) return resolve(null);
-
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        var scale = Math.min(canvas.width / iw, canvas.height / ih);
-        var dw = iw * scale;
-        var dh = ih * scale;
-
-        ctx.drawImage(
-          img, 0, 0, iw, ih,
-          (canvas.width - dw) / 2,
-          (canvas.height - dh) / 2,
-          dw, dh
-        );
-
-        try {
-          resolve(canvas.toDataURL("image/jpeg", 0.9));
-        } catch(e) {
-          resolve(null);
-        }
-      };
-
-      img.onerror = function(){ resolve(null); };
-      img.src = src;
-    });
-  }
-
-  btnPdf.onclick = function(){
-    if(!itens.length) return alert("Adicione fotos primeiro.");
-
-    var JsPDF = window.jspdf && window.jspdf.jsPDF;
-    if(!JsPDF){
-      return alert("A biblioteca jsPDF não carregou. Verifique a conexão e recarregue a página.");
-    }
-
-    var btn = this;
-    btn.textContent = "Gerando...";
-    btn.disabled = true;
-
-    var cols = parseInt(document.getElementById("col").value, 10) || 2;
-    var doc = new JsPDF();
-    var w = doc.internal.pageSize.getWidth();
-    var h = doc.internal.pageSize.getHeight();
-    var m = 10;
-    var gap = 6;
-    var cw = (w - m * 2 - gap * (cols - 1)) / cols;
-    var ch = cols === 1 ? 220 : (cols === 2 ? 115 : 78);
-    var targetRatio = cw / ch;
-
-    Promise.all(itens.map(function(it){
-      return processarImagem(it.img, targetRatio).then(function(data){
-        return {b:data, l:it.l};
-      });
-    })).then(function(prontos){
-      var loja = document.getElementById("loja").value.trim() || "Lookbook";
-      var site = normalizarUrl(document.getElementById("site").value);
-      var numeroWpp = document.getElementById("wpp").value.replace(/\D/g, "");
-      var wpp = numeroWpp ? "https://wa.me/" + numeroWpp : "";
-
-      var hex = document.getElementById("cor").value.replace("#", "");
-      var n = parseInt(hex, 16) || 0x1e293b;
-      var r = (n >> 16) & 255;
-      var g = (n >> 8) & 255;
-      var b = n & 255;
-
-      // Capa
-      doc.setFillColor(r, g, b);
-      doc.rect(0, 0, w, h, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(26);
-      doc.text(doc.splitTextToSize(loja.toUpperCase(), w - 30), w / 2, 125, {align:"center"});
-      doc.setFontSize(13);
-      doc.text(
-        doc.splitTextToSize(document.getElementById("capa").value.toUpperCase(), w - 30),
-        w / 2, 140, {align:"center"}
-      );
-
-      function rodape(){
-        doc.setFillColor(r, g, b);
-        doc.roundedRect(w - 92, h - 17, 40, 9, 2, 2, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.text("VER NO SITE", w - 72, h - 11, {align:"center"});
-        if(site) doc.link(w - 92, h - 17, 40, 9, {url:site});
-
-        doc.setFillColor(22, 163, 74);
-        doc.roundedRect(w - 50, h - 17, 40, 9, 2, 2, "F");
-        doc.text("WHATSAPP", w - 30, h - 11, {align:"center"});
-        if(wpp) doc.link(w - 50, h - 17, 40, 9, {url:wpp});
-      }
-
-      // Páginas dos produtos
-      doc.addPage();
-      var col = 0;
-      var y = 14;
-
-      for(var i = 0; i < prontos.length; i++){
-        var it = prontos[i];
-
-        if(y + ch > h - 22){
-          rodape();
-          doc.addPage();
-          y = 14;
-          col = 0;
-        }
-
-        var x = m + col * (cw + gap);
-
-        if(it.b){
-          try {
-            doc.addImage(it.b, "JPEG", x, y, cw, ch);
-          } catch(e) {
-            doc.setFillColor(240, 240, 240);
-            doc.rect(x, y, cw, ch, "F");
-          }
-        } else {
-          doc.setFillColor(240, 240, 240);
-          doc.rect(x, y, cw, ch, "F");
-        }
-
-        var produtoUrl = normalizarUrl(it.l, site);
-        if(produtoUrl) doc.link(x, y, cw, ch, {url:produtoUrl});
-
-        col++;
-        if(col >= cols){
-          col = 0;
-          y += ch + gap;
-        }
-      }
-
-      rodape();
-
-      var nomeArquivo = loja
-        .replace(/[^\p{L}\p{N}_-]+/gu, "_")
-        .replace(/^_+|_+$/g, "") || "Lookbook";
-
-      doc.save("Lookbook_" + nomeArquivo + ".pdf");
-    }).catch(function(e){
-      alert("Não foi possível gerar o PDF: " + (e && e.message ? e.message : "erro inesperado."));
-    }).finally(function(){
-      btn.textContent = "📄 BAIXAR PDF";
-      btn.disabled = false;
-    });
-  };
-})();
-</script>
-</body>
-</html>
+  ]
+}
