@@ -191,3 +191,96 @@ function hexRgb(hex){
 }
 
 document.getElementById("bPdf").onclick=async function(){
+  if(!itens.length)return alert("Adicione ou capture pelo menos 1 foto primeiro.");
+  var btn=document.getElementById("bPdf");
+  btn.innerText="Montando PDF...";btn.disabled=true;
+
+  try{
+    var doc=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    var w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+    var loja=document.getElementById("loja").value.trim();
+    var site=document.getElementById("site").value.trim();
+    var wppNum=document.getElementById("wpp").value.replace(/\D/g,"");
+    var linkWpp="https://wa.me"+wppNum+"?text="+encodeURIComponent("Olá! Vi o catálogo da "+loja+" e gostaria de atendimento.");
+    var rgb=hexRgb(document.getElementById("cor").value);
+    var cols=parseInt(document.getElementById("col").value)||2;
+    var rodapeTxt=document.getElementById("rodapeTxt").value;
+
+    doc.setFillColor(rgb.r,rgb.g,rgb.b);
+    doc.rect(0,0,w,h,"F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(28);
+    doc.setFont("helvetica","bold");
+    doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
+    doc.setFontSize(13);
+    doc.setFont("helvetica","normal");
+    doc.text(document.getElementById("capaTxt").value.toUpperCase(),w/2,140,{align:"center"});
+
+    var porCat={};
+    itens.forEach(function(it){if(!porCat[it.c])porCat[it.c]=[];porCat[it.c].push(it);});
+    var cats=Object.keys(porCat);
+
+    var desenharRodape=function(){
+      var rY=h-18;
+      doc.setDrawColor(225);doc.line(10,rY-2,w-10,rY-2);
+      doc.setFontSize(8.5);doc.setTextColor(90);
+      doc.text(rodapeTxt,10,rY+4);
+
+      doc.setFillColor(rgb.r,rgb.g,rgb.b);
+      doc.roundedRect(w-92,rY,40,9,2,2,"F");
+      doc.setTextColor(255);doc.setFontSize(8);doc.setFont("helvetica","bold");
+      doc.text("VER NO SITE",w-72,rY+5.8,{align:"center"});
+      doc.link(w-92,rY,40,9,{url:site});
+
+      doc.setFillColor(22,163,74);
+      doc.roundedRect(w-50,rY,40,9,2,2,"F");
+      doc.text("WHATSAPP",w-30,rY+5.8,{align:"center"});
+      doc.link(w-50,rY,40,9,{url:linkWpp});
+    };
+
+    for(var cIdx=0;cIdx<cats.length;cIdx++){
+      doc.addPage();
+      var cNome=cats.slice(cIdx,cIdx+1).shift();
+
+      doc.setFillColor(rgb.r,rgb.g,rgb.b);
+      doc.rect(10,10,w-20,10,"F");
+      doc.setTextColor(255);doc.setFontSize(11);doc.setFont("helvetica","bold");
+      doc.text(loja.toUpperCase()+"  •  "+cNome.toUpperCase(),14,16.5);
+
+      var m=10,gap=6;
+      var cw=(w-m*2-gap*(cols-1))/cols;
+      var ch=cols===1?220:(cols===2?115:78);
+      var col=0,y=24;
+
+      var listaCat=porCat[cNome];
+      for(var i=0;i<listaCat.length;i++){
+        var it=listaCat.slice(i,i+1).shift();
+        if(y+ch>h-22){
+          desenharRodape();
+          doc.addPage();
+          y=14;col=0;
+        }
+        var x=m+col*(cw+gap);
+        var b64=await carregarImgBase64(it.img);
+        if(b64){
+          try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}
+        }else{
+          doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");
+        }
+        doc.link(x,y,cw,ch,{url:it.l||site});
+
+        col++;
+        if(col>=cols){col=0;y+=ch+gap;}
+      }
+      desenharRodape();
+    }
+    doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
+  }catch(e){alert("Erro ao gerar PDF: "+e.message);}
+  btn.innerText="📄 BAIXAR LOOKBOOK PDF";btn.disabled=false;
+};
+
+render();
+var st=document.getElementById("st");st.innerText="🟢 v11 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+</script>
+</body>
+</html>
