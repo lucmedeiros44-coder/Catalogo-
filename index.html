@@ -21,13 +21,16 @@
   input[type="text"], input[type="url"], input[type="number"], input[type="password"], select {
     width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
   }
-  button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
+  button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; transition: opacity 0.2s; }
+  button:hover { opacity: 0.9; }
   .btn-blue { background: #2563eb; color: #fff; }
   .btn-green { background: #16a34a; color: #fff; }
   .btn-indigo { background: #4f46e5; color: #fff; }
   .btn-gray { background: #e5e7eb; color: #374151; }
+  .btn-red { background: #fee2e2; color: #dc2626; padding: 4px 8px; font-size: 11px; }
   .hidden { display: none !important; }
-  .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; }
+  .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; gap: 8px; }
+  .item-thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #e5e7eb; }
 </style>
 </head>
 <body>
@@ -36,7 +39,10 @@
   <div class="login-card">
     <h2 style="margin:0 0 6px 0;">Catálogo Pro PDF</h2>
     <p style="font-size:12px; color:#6b7280; margin:0 0 16px 0;">Digite sua chave de acesso</p>
-    <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; margin-bottom:12px;">
+    <div style="position:relative; margin-bottom:12px;">
+      <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; padding-right:40px;" onkeyup="if(event.key==='Enter') entrar()">
+      <button type="button" onclick="toggleSenha()" title="Mostrar/Ocultar senha" style="position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; padding:4px; font-size:14px;">👁️</button>
+    </div>
     <button type="button" onclick="entrar()" class="btn-blue" style="width:100%; padding:12px;">Entrar no Gerador</button>
     <p id="erroSenha" class="hidden" style="color:#dc2626; font-size:12px; margin-top:8px;">Senha incorreta.</p>
   </div>
@@ -49,7 +55,7 @@
       <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
     <div style="display:flex; gap:8px;">
-      <button type="button" onclick="gerarPDF()" class="btn-green">📄 BAIXAR PDF</button>
+      <button type="button" onclick="gerarPDF()" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
       <button type="button" onclick="sair()" class="btn-gray">Sair</button>
     </div>
   </div>
@@ -106,7 +112,7 @@
         <label>Cores, Fontes e Rodapé</label>
         <div class="grid-3" style="margin-bottom:10px;">
           <div><label>Cor</label><input type="color" id="corPrincipal" value="#1e293b" style="width:100%; height:38px;"></div>
-          <div><label>Fonte</label><input type="number" id="tamanhoFonte" value="11"></div>
+          <div><label>Fonte (pt)</label><input type="number" id="tamanhoFonte" value="11"></div>
           <div><label>Linha</label><input type="number" id="alturaLinha" value="1.3" step="0.1"></div>
         </div>
         <label>Texto do Rodapé</label>
@@ -114,7 +120,7 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:13px;">
           <span><input type="checkbox" id="attrPreco" checked> Preço</span>
           <span><input type="checkbox" id="attrSku" checked> Ref/SKU</span>
-          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos</span>
+          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos/Detalhes</span>
           <span><input type="checkbox" id="attrQr" checked> QR Code</span>
         </div>
       </div>
@@ -140,8 +146,8 @@
         </div>
         <div class="grid-3" style="margin-bottom:8px;">
           <input type="text" id="prodSku" placeholder="Ref/SKU">
-          <input type="text" id="prodSpecs" placeholder="Detalhes">
-          <input type="url" id="prodLink" placeholder="Link">
+          <input type="text" id="prodSpecs" placeholder="Detalhes (ex: P, M, G)">
+          <input type="url" id="prodLink" placeholder="Link do produto">
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
           <input type="file" id="prodImagem" accept="image/*" style="font-size:12px; flex:1;">
@@ -151,43 +157,41 @@
 
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <label style="margin:0;">Itens no Catálogo (<span id="contItens">0</span>)</label>
-          <button type="button" onclick="produtos=[];renderLista()" class="btn-gray" style="padding:4px 8px; font-size:11px;">Limpar</button>
+          <label style="margin:0;">Itens no Catálogo (<span id="contagemItens">0</span>)</label>
+          <button type="button" onclick="limparLista()" class="btn-red">Limpar Tudo</button>
         </div>
-        <div id="listaProdutos" style="max-height:320px; overflow-y:auto;"></div>
+        <div id="listaItens" style="max-height: 320px; overflow-y: auto;"></div>
       </div>
     </div>
   </div>
 </div>
 
+<div id="qrTemp" style="display:none;"></div>
+
 <script>
-var SENHA_APP = "vip2026";
-var IMG_VAZIA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABmJLR0QA/wD/AP+gvaeTAAABJElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcAz0AAAd654/gAAAAASUVORK5CYII=";
-var logoBase64 = null;
-var produtos = [];
+  const SENHA_MESTRA = "vip2026";
+  let logoBase64 = null;
+  let produtos = [];
 
-function entrar() {
-  var s = document.getElementById('inputSenha').value.trim();
-  if (s === SENHA_APP) {
-    try { localStorage.setItem('cat_auth', '1'); } catch(e) {}
-    mostrarApp();
-  } else {
-    document.getElementById('erroSenha').classList.remove('hidden');
+  if (sessionStorage.getItem("catalogo_auth") === "true") {
+    mostrarPainel();
   }
-}
 
-function mostrarApp() {
-  document.getElementById('telaLogin').classList.add('hidden');
-  document.getElementById('painelApp').classList.remove('hidden');
-}
+  function toggleSenha() {
+    const inp = document.getElementById("inputSenha");
+    inp.type = inp.type === "password" ? "text" : "password";
+  }
 
-function sair() {
-  try { localStorage.removeItem('cat_auth'); } catch(e) {}
-  location.reload();
-}
+  function entrar() {
+    const val = document.getElementById("inputSenha").value.trim().toLowerCase();
+    if (val === SENHA_MESTRA) {
+      sessionStorage.setItem("catalogo_auth", "true");
+      document.getElementById("erroSenha").classList.add("hidden");
+      mostrarPainel();
+    } else {
+      document.getElementById("erroSenha").classList.remove("hidden");
+    }
+  }
 
-try { if (localStorage.getItem('cat_auth') === '1') mostrarApp(); } catch(e) {}
-
-function setNicho(tipo) {
-  if (tipo === 'moda') {
-    document.getElementById('nomeLoja').value = "Loja Simone Lit";
+  function sair() {
+    sessionStorage.removeItem("catalogo_auth");
