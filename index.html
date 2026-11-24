@@ -3,585 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catálogo Pro PDF v7.0</title>
+<title>Catálogo Pro PDF v8</title>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
 <style>
-  * { box-sizing: border-box; font-family: sans-serif; }
-  body { margin: 0; background: #f3f4f6; color: #1f2937; }
-  .container { max-width: 1100px; margin: 0 auto; padding: 14px; }
-  .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-  .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
-  input[type="text"], input[type="url"], input[type="number"], select, textarea {
-    width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
-  }
-  button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
-  .btn-blue { background: #2563eb; color: #fff; }
-  .btn-green { background: #16a34a; color: #fff; }
-  .btn-indigo { background: #4f46e5; color: #fff; }
-  .btn-gray { background: #e5e7eb; color: #374151; }
-  .btn-red { background: #fee2e2; color: #dc2626; padding: 4px 8px; font-size: 11px; }
-  .hidden { display: none !important; }
-  .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; gap: 8px; }
-  .item-thumb { width: 42px; height: 42px; object-fit: cover; border-radius: 6px; background: #e5e7eb; }
+  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
+  .box{max-width:960px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:3px;text-transform:uppercase}
+  input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
+  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
+  .row{display:flex;justify-content:space-between;align-items:center;border:1px solid #e5e7eb;padding:7px;border-radius:7px;margin-bottom:5px;background:#f9fafb}
 </style>
 </head>
 <body>
-
-<div id="painelApp" class="container">
-  <div class="card header">
-    <div>
-      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF <span id="badgeStatus" style="font-size:11px; background:#fee2e2; color:#dc2626; padding:2px 6px; border-radius:6px;">🔴 Carregando...</span></h1>
-      <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
-    </div>
-    <button type="button" id="btnGerar" class="btn-green">📄 BAIXAR PDF</button>
+<div class="box">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div><b style="font-size:18px">Catálogo Pro PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:5px">🔴 Erro JS</span></div>
+    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
   </div>
-
-  <div class="card" style="border-left: 4px solid #2563eb;">
-    <div class="grid-4">
-      <div><label>1. NOME DA LOJA</label><input type="text" id="nomeLoja" value="Loja Simone Lit"></div>
-      <div><label>2. LINK DO SITE</label><input type="url" id="linkSite" value="https://simonelit.com.br"></div>
-      <div><label>3. NÚMERO WHATSAPP</label><input type="text" id="numWhatsapp" value="553132843022"></div>
-      <div><label>4. TOTAL DE PRODUTOS</label><input type="number" id="totalProdutos" value="12" min="1" max="300"></div>
+  <div class="card g4">
+    <div><label>Nome da Loja</label><input id="loja" value="Loja Simone Lit"></div>
+    <div><label>Link do Site</label><input id="site" value="https://simonelit.com.br"></div>
+    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
+    <div><label>Máx. Produtos</label><input type="number" id="max" value="12"></div>
+  </div>
+  <div class="card g3">
+    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px"></div>
+    <div><label>Fonte (pt)</label><input type="number" id="fnt" value="11"></div>
+    <div><label>Por Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
+  </div>
+  <div class="card" style="background:#eef2ff">
+    <label style="color:#312e81">Importar por Link ou Colar Texto/HTML da Loja</label>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <input id="urlImp" value="https://simonelit.com.br" style="flex:2">
+      <input id="catImp" value="Destaques" style="flex:1">
+      <button id="bImp" style="background:#4f46e5">Importar</button>
+    </div>
+    <textarea id="txtImp" rows="2" placeholder="Ou cole aqui o Ctrl+A / Ctrl+U da página da loja..."></textarea>
+    <button id="bColar" style="background:#2563eb;width:100%;margin-top:6px">Extrair do Texto Colado</button>
+    <div id="msgImp" style="font-size:12px;font-weight:bold;margin-top:6px"></div>
+  </div>
+  <div class="card">
+    <label>Adicionar Manualmente</label>
+    <div class="g3" style="margin-bottom:8px">
+      <input id="pNome" placeholder="Nome do produto"><input id="pCat" placeholder="Categoria"><input id="pPreco" placeholder="R$ 0,00">
+    </div>
+    <div style="display:flex;gap:8px">
+      <input type="file" id="pImg" accept="image/*" style="flex:1"><button id="bAdd" style="background:#2563eb">+ Adicionar</button>
     </div>
   </div>
-
-  <div class="grid-2">
-    <div>
-      <div class="card">
-        <label>Perfil Rápido (Nicho)</label>
-        <div class="grid-3">
-          <button type="button" id="btnModa" class="btn-gray">👗 Moda</button>
-          <button type="button" id="btnOtica" class="btn-gray">👓 Ótica</button>
-          <button type="button" id="btnRest" class="btn-gray">🍽️ Restaurante</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <label>Logo, Capa e Grade</label>
-        <input type="file" id="logoLoja" accept="image/*" style="margin-bottom:10px; font-size:12px;">
-        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-          <input type="checkbox" id="incluirCapa" checked style="width:auto;">
-          <span style="font-size:13px; font-weight:bold;">Capa:</span>
-          <input type="text" id="tituloCapa" value="COLEÇÃO ATUAL">
-        </div>
-        <label>Produtos por Página</label>
-        <select id="tipoGrade">
-          <option value="1">1 Produto Grande por Página</option>
-          <option value="2" selected>2 Produtos por Linha</option>
-          <option value="3">3 Produtos por Linha</option>
-        </select>
-      </div>
-
-      <div class="card">
-        <label>Cores, Fontes e Rodapé</label>
-        <div class="grid-3" style="margin-bottom:10px;">
-          <div><label>Cor</label><input type="color" id="corPrincipal" value="#1e293b" style="width:100%; height:38px;"></div>
-          <div><label>Fonte (pt)</label><input type="number" id="tamanhoFonte" value="11"></div>
-          <div><label>Linha</label><input type="number" id="alturaLinha" value="1.3" step="0.1"></div>
-        </div>
-        <label>Texto do Rodapé</label>
-        <input type="text" id="textoRodape" value="Toque nas fotos para comprar no site ou peça pelo WhatsApp" style="margin-bottom:10px;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:13px;">
-          <span><input type="checkbox" id="attrPreco" checked> Preço</span>
-          <span><input type="checkbox" id="attrSku" checked> Ref/SKU</span>
-          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos</span>
-          <span><input type="checkbox" id="attrQr" checked> QR Code</span>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card" style="background:#eef2ff; border:1px solid #c7d2fe;">
-        <label style="color:#312e81;">🚀 1. Extrair Direto por Link</label>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-          <input type="url" id="urlExtracao" value="https://simonelit.com.br" style="flex:2; min-width:160px;">
-          <input type="text" id="catExtracao" value="Destaques" placeholder="Categoria" style="flex:1; min-width:100px;">
-          <button type="button" id="btnExtrair" class="btn-indigo">Importar</button>
-        </div>
-        <details style="margin-top:8px; border-top:1px solid #c7d2fe; padding-top:8px;">
-          <summary style="font-size:12px; font-weight:700; color:#312e81; cursor:pointer;">📋 2. Alternativa: Colar Código/Texto da Página</summary>
-          <textarea id="htmlColado" rows="3" placeholder="Cole aqui o Ctrl+U ou Ctrl+A da loja..." style="font-size:12px; margin:6px 0;"></textarea>
-          <button type="button" id="btnProcessarColado" class="btn-blue" style="width:100%;">Processar Conteúdo Colado</button>
-        </details>
-        <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
-      </div>
-
-      <div class="card">
-        <label>Adicionar Item Manualmente</label>
-        <div class="grid-3" style="margin-bottom:8px;">
-          <input type="text" id="prodNome" placeholder="Nome">
-          <input type="text" id="prodCat" placeholder="Categoria">
-          <input type="text" id="prodPreco" placeholder="R$ 0,00">
-        </div>
-        <div class="grid-3" style="margin-bottom:8px;">
-          <input type="text" id="prodSku" placeholder="Ref/SKU">
-          <input type="text" id="prodSpecs" placeholder="Detalhes">
-          <input type="url" id="prodLink" placeholder="Link do produto">
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <input type="file" id="prodImagem" accept="image/*" style="font-size:12px; flex:1;">
-          <button type="button" id="btnAddManual" class="btn-blue">+ Add</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <label style="margin:0;">Itens no Catálogo (<span id="contagemItens">0</span>)</label>
-          <button type="button" id="btnLimpar" class="btn-red">Limpar Tudo</button>
-        </div>
-        <div id="listaItens" style="max-height: 320px; overflow-y: auto;"></div>
-      </div>
-    </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label>Lista (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div id="lista"></div>
   </div>
 </div>
-<div id="qrTemp" style="display:none;"></div>
+<div id="qr" style="display:none"></div>
 <script>
-  window.onerror = function(msg, url, line) {
-    var b = document.getElementById("badgeStatus");
-    if (b) {
-      b.innerText = "⚠️ Erro linha " + line + ": " + msg;
-      b.style.background = "#fef3c7";
-      b.style.color = "#b45309";
-    }
-  };
-
-  var logoBase64 = null;
-  var produtos = [];
-
-  function pegarOrigem(urlStr) {
-    var partes = urlStr.split("/");
-    return partes.length >= 3 ? partes.slice(0, 3).join("/") : urlStr;
-  }
-
-  function setNicho(nicho) {
-    if (nicho === "moda") {
-      document.getElementById("tituloCapa").value = "NOVA COLEÇÃO";
-      document.getElementById("prodSpecs").placeholder = "Tamanhos (P, M, G)";
-      document.getElementById("corPrincipal").value = "#1e293b";
-    } else if (nicho === "otica") {
-      document.getElementById("tituloCapa").value = "CATÁLOGO DE ARMAÇÕES";
-      document.getElementById("prodSpecs").placeholder = "Material / Aro / Cor";
-      document.getElementById("corPrincipal").value = "#0369a1";
-    } else if (nicho === "restaurante") {
-      document.getElementById("tituloCapa").value = "CARDÁPIO DIGITAL";
-      document.getElementById("prodSpecs").placeholder = "Ingredientes / Porção";
-      document.getElementById("corPrincipal").value = "#b91c1c";
-    }
-  }
-
-  function lerLogo(event) {
-    var files = event.target.files;
-    if (!files || files.length === 0) return;
-    var reader = new FileReader();
-    reader.onload = function(e) { logoBase64 = e.target.result; };
-    reader.readAsDataURL(files.item(0));
-  }
-
-  function addManual() {
-    var nome = document.getElementById("prodNome").value.trim();
-    if (!nome) return alert("Digite o nome do produto.");
-
-    var cat = document.getElementById("prodCat").value.trim() || "Geral";
-    var preco = document.getElementById("prodPreco").value.trim() || "";
-    var sku = document.getElementById("prodSku").value.trim() || "";
-    var specs = document.getElementById("prodSpecs").value.trim() || "";
-    var link = document.getElementById("prodLink").value.trim() || document.getElementById("linkSite").value.trim();
-    var fileInput = document.getElementById("prodImagem");
-
-    var salvar = function(imgData) {
-      produtos.push({ nome: nome, cat: cat, preco: preco, sku: sku, specs: specs, link: link, img: imgData });
-      document.getElementById("prodNome").value = "";
-      document.getElementById("prodPreco").value = "";
-      document.getElementById("prodSku").value = "";
-      document.getElementById("prodSpecs").value = "";
-      document.getElementById("prodLink").value = "";
-      fileInput.value = "";
-      renderizarLista();
-    };
-
-    if (fileInput.files && fileInput.files.length > 0) {
-      var reader = new FileReader();
-      reader.onload = function(e) { salvar(e.target.result); };
-      reader.readAsDataURL(fileInput.files.item(0));
-    } else {
-      salvar(null);
-    }
-  }
-
-  function removerItem(idx) {
-    produtos.splice(idx, 1);
-    renderizarLista();
-  }
-
-  function limparLista() {
-    produtos = [];
-    renderizarLista();
-  }
-
-  function renderizarLista() {
-    var container = document.getElementById("listaItens");
-    document.getElementById("contagemItens").innerText = produtos.length;
-    if (produtos.length === 0) {
-      container.innerHTML = '<p style="font-size:12px; color:#9ca3af; text-align:center; padding:16px 0;">Nenhum produto adicionado.</p>';
-      return;
-    }
-    container.innerHTML = produtos.map(function(p, i) {
-      var thumb = p.img
-        ? '<img src="' + p.img + '" class="item-thumb">'
-        : '<div class="item-thumb" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:#6b7280;">Sem foto</div>';
-      return '<div class="item-row">' +
-        '<div style="display:flex; align-items:center; gap:10px; overflow:hidden;">' +
-          thumb +
-          '<div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">' +
-            '<div style="font-weight:700; font-size:13px;">' + p.nome + '</div>' +
-            '<div style="font-size:11px; color:#6b7280;">' + p.cat + ' • ' + p.preco + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<button type="button" onclick="removerItem(' + i + ')" class="btn-red">X</button>' +
-      '</div>';
-    }).join("");
-  }
-
-  function urlParaBase64(imgUrl) {
-    if (!imgUrl) return Promise.resolve(null);
-    if (imgUrl.indexOf("data:image") === 0) return Promise.resolve(imgUrl);
-    var clean = imgUrl.replace(/^https?:\/\//, "");
-    var proxy = "https://weserv.nl" + encodeURIComponent(clean) + "&w=500&output=jpg";
-    return fetch(proxy).then(function(r) { return r.ok ? r.blob() : null; }).then(function(blob) {
-      if (!blob) return null;
-      return new Promise(function(res) {
-        var rd = new FileReader();
-        rd.onloadend = function() { res(rd.result); };
-        rd.onerror = function() { res(null); };
-        rd.readAsDataURL(blob);
-      });
-    }).catch(function() { return null; });
-  }
-
-  async function analisarHtml(htmlStr, baseUrl, nomeCat) {
-    var limite = parseInt(document.getElementById("totalProdutos").value) || 12;
-    var status = document.getElementById("statusExtracao");
-    var parser = new DOMParser();
-    var doc = parser.parseFromString(htmlStr, "text/html");
-    var origem = pegarOrigem(baseUrl);
-
-    var cards = doc.querySelectorAll(".js-item-product, .item-product, .product, .grid-item, [data-product-id]");
-    var achados = [];
-
-    cards.forEach(function(card) {
-      if (achados.length >= limite) return;
-      var tEl = card.querySelector(".js-item-name, .item-name, .woocommerce-loop-product__title, h2, h3, a[title]");
-      var pEl = card.querySelector(".js-price-display, .item-price, .price, [data-product-price]");
-      var iEl = card.querySelector("img");
-      var lEl = card.querySelector("a");
-
-      var nome = tEl ? (tEl.getAttribute("title") || tEl.innerText).trim() : "";
-      if (!nome) return;
-
-      var imgSrc = "";
-      if (iEl) {
-        var srcset = iEl.getAttribute("data-srcset") || iEl.getAttribute("srcset") || "";
-        imgSrc = srcset ? srcset.split(",").pop().trim().split(" ").shift() : (iEl.getAttribute("data-src") || iEl.getAttribute("src") || "");
+var itens=[];
+function render(){
+  document.getElementById("qtd").innerText=itens.length;
+  document.getElementById("lista").innerHTML=itens.map(function(p,i){
+    return '<div class="row"><span><b>'+p.n+'</b> ('+p.c+') - '+p.p+'</span><button onclick="itens.splice('+i+',1);render()" style="background:#dc2626;padding:3px 7px;font-size:11px">X</button></div>';
+  }).join("");
+}
+document.getElementById("bAdd").onclick=function(){
+  var n=document.getElementById("pNome").value.trim();if(!n)return alert("Digite o nome");
+  var c=document.getElementById("pCat").value.trim()||"Geral",p=document.getElementById("pPreco").value.trim(),f=document.getElementById("pImg");
+  var push=function(img){itens.push({n:n,c:c,p:p,img:img,l:document.getElementById("site").value});document.getElementById("pNome").value="";f.value="";render();};
+  if(f.files&&f.files.length){var r=new FileReader();r.onload=function(e){push(e.target.result)};r.readAsDataURL(f.files.item(0));}else push(null);
+};
+document.getElementById("bLimpar").onclick=function(){itens=[];render();};
+function parseHtml(h,cat,base){
+  var doc=new DOMParser().parseFromString(h,"text/html"),cards=doc.querySelectorAll(".js-item-product,.item-product,.product,.grid-item"),add=0,max=parseInt(document.getElementById("max").value)||12;
+  cards.forEach(function(el){
+    if(add>=max)return;
+    var t=el.querySelector(".js-item-name,.item-name,h2,h3,a[title]"),pr=el.querySelector(".js-price-display,.item-price,.price"),a=el.querySelector("a");
+    var nome=t?(t.getAttribute("title")||t.innerText).trim():"";if(!nome)return;
+    itens.push({n:nome,c:cat,p:pr?pr.innerText.trim().split("\n").shift():"",img:null,l:a?a.getAttribute("href"):base});add++;
+  });
+  if(!add){
+    h.split("\n").forEach(function(l,idx,arr){
+      if(add<max&&l.trim().indexOf("R$")===0&&idx>0){
+        var prev=arr.slice(idx-1,idx).shift().trim();
+        if(prev.length>4&&prev.indexOf("R$")!==0){itens.push({n:prev,c:cat,p:l.trim(),img:null,l:base});add++;}
       }
-      if (imgSrc.indexOf("//") === 0) imgSrc = "https:" + imgSrc;
-      else if (imgSrc.indexOf("/") === 0) imgSrc = origem + imgSrc;
-
-      var link = lEl ? lEl.getAttribute("href") : baseUrl;
-      if (link && link.indexOf("/") === 0) link = origem + link;
-
-      var preco = pEl ? pEl.innerText.trim().split("\n").shift().trim() : "";
-      achados.push({ nome: nome, cat: nomeCat, preco: preco, sku: "", specs: "", link: link || baseUrl, rawImg: imgSrc });
-    });
-
-    if (achados.length === 0 && htmlStr.indexOf("<html") === -1) {
-      var linhas = htmlStr.split("\n").map(function(l) { return l.trim(); }).filter(Boolean);
-      for (var j = 0; j < linhas.length; j++) {
-        if (achados.length >= limite) break;
-        var atual = linhas.slice(j, j + 1).shift();
-        if (atual.indexOf("R$") === 0 && j > 0) {
-          var ant = linhas.slice(j - 1, j).shift();
-          if (ant.length > 4 && ant.indexOf("R$") !== 0 && ant.indexOf("OFF") === -1) {
-            achados.push({ nome: ant, cat: nomeCat, preco: atual, sku: "", specs: "", link: baseUrl, rawImg: null });
-          }
-        }
-      }
-    }
-
-    if (achados.length > 0) {
-      for (var i = 0; i < achados.length; i++) {
-        var it = achados.slice(i, i + 1).shift();
-        status.innerText = "Baixando imagem " + (i + 1) + "/" + achados.length + "...";
-        var b64 = await urlParaBase64(it.rawImg);
-        produtos.push({ nome: it.nome, cat: it.cat, preco: it.preco, sku: "", specs: "", link: it.link, img: b64 });
-      }
-      status.style.color = "#16a34a";
-      status.innerText = "✅ " + achados.length + " produtos importados!";
-      renderizarLista();
-      return true;
-    }
-    return false;
-  }
-
-  async function extrairSite() {
-    var url = document.getElementById("urlExtracao").value.trim();
-    var cat = document.getElementById("catExtracao").value.trim() || "Coleção";
-    var status = document.getElementById("statusExtracao");
-    var btn = document.getElementById("btnExtrair");
-
-    btn.disabled = true;
-    status.classList.remove("hidden");
-    status.style.color = "#4f46e5";
-    status.innerText = "Conectando (Tentativa 1/3)...";
-
-    var html = null;
-    try {
-      var r1 = await fetch("https://codetabs.com" + encodeURIComponent(url));
-      if (r1.ok) html = await r1.text();
-    } catch (e1) {}
-
-    if (!html) {
-      status.innerText = "Conectando (Tentativa 2/3)...";
-      try {
-        var r2 = await fetch("https://corsproxy.io?" + encodeURIComponent(url));
-        if (r2.ok) html = await r2.text();
-      } catch (e2) {}
-    }
-
-    if (!html) {
-      status.innerText = "Conectando (Tentativa 3/3)...";
-      try {
-        var r3 = await fetch("https://allorigins.win" + encodeURIComponent(url));
-        if (r3.ok) { var j3 = await r3.json(); html = j3.contents; }
-      } catch (e3) {}
-    }
-
-    if (html) {
-      var ok = await analisarHtml(html, url, cat);
-      if (!ok) {
-        status.style.color = "#d97706";
-        status.innerText = "⚠️ Layout protegido. Use a opção '2. Colar Código/Texto' acima!";
-      }
-    } else {
-      status.style.color = "#dc2626";
-      status.innerText = "❌ Bloqueio do site. Abra a loja, aperte Ctrl+U -> Ctrl+A -> Ctrl+C e cole na opção 2!";
-    }
-    btn.disabled = false;
-  }
-
-  async function processarColado() {
-    var txt = document.getElementById("htmlColado").value.trim();
-    if (!txt) return alert("Cole o conteúdo da página primeiro.");
-    var url = document.getElementById("linkSite").value.trim() || "https://simonelit.com.br";
-    var cat = document.getElementById("catExtracao").value.trim() || "Coleção";
-    var status = document.getElementById("statusExtracao");
-    status.classList.remove("hidden");
-    status.style.color = "#4f46e5";
-       status.innerText = "Lendo produtos...";
-
-    if (await analisarHtml(txt, url, cat)) {
-      document.getElementById("htmlColado").value = "";
-    } else {
-      status.style.color = "#dc2626";
-      status.innerText = "❌ Nenhum produto identificado no texto colado.";
-    }
-  }
-
-  function gerarQr(texto) {
-    return new Promise(function(res) {
-      if (typeof QRCode === "undefined") return res(null);
-      var div = document.getElementById("qrTemp");
-      div.innerHTML = "";
-      new QRCode(div, { text: texto, width: 80, height: 80 });
-      setTimeout(function() {
-        var c = div.querySelector("canvas");
-        res(c ? c.toDataURL("image/png") : null);
-      }, 50);
     });
   }
-
-  function hexRgb(hex) {
-    var n = parseInt(hex.replace("#", ""), 16);
-    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  render();return add;
+}
+document.getElementById("bImp").onclick=async function(){
+  var u=document.getElementById("urlImp").value.trim(),c=document.getElementById("catImp").value.trim()||"Geral",m=document.getElementById("msgImp");
+  m.innerText="Buscando...";
+  try{
+    var r=await fetch("https://codetabs.com"+encodeURIComponent(u));
+    var txt=await r.text(),n=parseHtml(txt,c,u);
+    m.innerText=n?("✅ "+n+" itens importados!"):"⚠️ Site bloqueou. Cole o texto abaixo!";
+  }catch(e){m.innerText="❌ Erro de conexão. Use a caixa de texto abaixo!";}
+};
+document.getElementById("bColar").onclick=function(){
+  var txt=document.getElementById("txtImp").value.trim();if(!txt)return alert("Cole o texto primeiro");
+  var n=parseHtml(txt,document.getElementById("catImp").value.trim()||"Geral",document.getElementById("site").value);
+  document.getElementById("msgImp").innerText=n?("✅ "+n+" itens extraídos!"):"❌ Nada encontrado.";
+  if(n)document.getElementById("txtImp").value="";
+};
+document.getElementById("bPdf").onclick=async function(){
+  if(!itens.length)return alert("Adicione itens primeiro");
+  var doc=new window.jspdf.jsPDF(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+  var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
+  var cols=parseInt(document.getElementById("col").value)||2,fnt=parseInt(document.getElementById("fnt").value)||11;
+  var cw=(w-20-(cols-1)*6)/cols,ch=cols===1?110:75,ih=cols===1?75:45,col=0,y=22;
+  doc.setFillColor(30,41,59);doc.rect(10,8,w-20,10,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.text(loja.toUpperCase(),14,14.5);
+  for(var i=0;i<itens.length;i++){
+    var it=itens.slice(i,i+1).shift();
+    if(y+ch>h-20){doc.addPage();y=15;col=0;}
+    var x=10+col*(cw+6);doc.setDrawColor(220);doc.rect(x,y,cw,ch);
+    if(it.img)try{doc.addImage(it.img,"JPEG",x+2,y+2,cw-4,ih);}catch(e){}
+    doc.link(x+2,y+2,cw-4,ih,{url:it.l||site});
+    doc.setTextColor(20);doc.setFontSize(fnt);doc.text(it.n.substring(0,26),x+3,y+ih+7);
+    doc.setTextColor(22,163,74);doc.text(it.p,x+3,y+ih+13);
+    col++;if(col>=cols){col=0;y+=ch+6;}
   }
-
-  async function gerarPDF() {
-    if (typeof window.jspdf === "undefined") return alert("Biblioteca PDF carregando, tente em 2s.");
-    if (produtos.length === 0) return alert("Adicione pelo menos 1 produto antes de baixar.");
-    var btn = document.getElementById("btnGerar");
-    btn.innerText = "Gerando PDF...";
-    btn.disabled = true;
-
-    try {
-      var CtorPDF = window.jspdf.jsPDF;
-      var doc = new CtorPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      var pageW = doc.internal.pageSize.getWidth();
-      var pageH = doc.internal.pageSize.getHeight();
-
-      var loja = document.getElementById("nomeLoja").value.trim();
-      var site = document.getElementById("linkSite").value.trim();
-      var wpp = document.getElementById("numWhatsapp").value.replace(/\D/g, "");
-      var linkWpp = "https://wa.me" + wpp + "?text=" + encodeURIComponent("Olá! Vi o catálogo da " + loja);
-      var rgb = hexRgb(document.getElementById("corPrincipal").value);
-      var fSize = parseInt(document.getElementById("tamanhoFonte").value) || 11;
-      var lHeight = parseFloat(document.getElementById("alturaLinha").value) || 1.3;
-      var rodapeTxt = document.getElementById("textoRodape").value;
-      var cols = parseInt(document.getElementById("tipoGrade").value) || 2;
-      var max = parseInt(document.getElementById("totalProdutos").value) || 300;
-
-      var sPreco = document.getElementById("attrPreco").checked;
-      var sSku = document.getElementById("attrSku").checked;
-      var sSpecs = document.getElementById("attrSpecs").checked;
-      var sQr = document.getElementById("attrQr").checked;
-
-      if (document.getElementById("incluirCapa").checked) {
-        doc.setFillColor(rgb.r, rgb.g, rgb.b);
-        doc.rect(0, 0, pageW, pageH, "F");
-        doc.setTextColor(255, 255, 255);
-        if (logoBase64) { try { doc.addImage(logoBase64, "PNG", (pageW - 50) / 2, 50, 50, 50); } catch(e) {} }
-        doc.setFontSize(26);
-        doc.setFont("helvetica", "bold");
-        doc.text(loja.toUpperCase(), pageW / 2, 125, { align: "center" });
-        doc.setFontSize(16);
-        doc.setFont("helvetica", "normal");
-        doc.text(document.getElementById("tituloCapa").value.toUpperCase(), pageW / 2, 140, { align: "center" });
-        doc.addPage();
-      }
-
-      var lista = produtos.slice(0, max);
-      var porCat = {};
-      lista.forEach(function(p) {
-        var c = p.cat || "Geral";
-        if (!porCat[c]) porCat[c] = [];
-        porCat[c].push(p);
-      });
-
-      var rodape = function() {
-        var rY = pageH - 18;
-        doc.setDrawColor(220, 220, 220);
-        doc.line(10, rY - 2, pageW - 10, rY - 2);
-        doc.setFontSize(8);
-        doc.setTextColor(100, 100, 100);
-        doc.text(rodapeTxt, 10, rY + 3);
-
-        doc.setFillColor(rgb.r, rgb.g, rgb.b);
-        doc.roundedRect(pageW - 88, rY, 38, 8, 2, 2, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "bold");
-        doc.text("VER NO SITE", pageW - 69, rY + 5.3, { align: "center" });
-        doc.link(pageW - 88, rY, 38, 8, { url: site });
-
-        doc.setFillColor(22, 163, 74);
-        doc.roundedRect(pageW - 48, rY, 38, 8, 2, 2, "F");
-        doc.text("WHATSAPP", pageW - 29, rY + 5.3, { align: "center" });
-        doc.link(pageW - 48, rY, 38, 8, { url: linkWpp });
-      };
-
-      var cats = Object.keys(porCat);
-      for (var cIdx = 0; cIdx < cats.length; cIdx++) {
-        if (cIdx > 0) doc.addPage();
-        var catNome = cats.slice(cIdx, cIdx + 1).shift();
-
-        doc.setFillColor(rgb.r, rgb.g, rgb.b);
-        doc.rect(10, 10, pageW - 20, 10, "F");
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.text(loja + " • " + catNome.toUpperCase(), 14, 16.5);
-
-        var m = 10, gap = 6;
-        var cardW = (pageW - m * 2 - gap * (cols - 1)) / cols;
-        var cardH = cols === 1 ? 120 : (cols === 2 ? 82 : 68);
-        var imgH = cols === 1 ? 82 : (cols === 2 ? 50 : 38);
-        var col = 0, y = 25;
-
-        var itens = porCat[catNome];
-        for (var idx = 0; idx < itens.length; idx++) {
-          var item = itens.slice(idx, idx + 1).shift();
-          if (y + cardH > pageH - 22) {
-            rodape();
-            doc.addPage();
-            y = 15;
-            col = 0;
-          }
-
-          var x = m + col * (cardW + gap);
-          doc.setDrawColor(225, 228, 232);
-          doc.roundedRect(x, y, cardW, cardH, 2, 2, "S");
-
-          if (item.img && item.img.indexOf("data:image") === 0) {
-            try { doc.addImage(item.img, "JPEG", x + 2, y + 2, cardW - 4, imgH); } catch(e) {}
-          } else {
-            doc.setFillColor(243, 244, 246);
-            doc.rect(x + 2, y + 2, cardW - 4, imgH, "F");
-          }
-          doc.link(x + 2, y + 2, cardW - 4, imgH, { url: item.link || site });
-
-          var tY = y + imgH + 7;
-          doc.setTextColor(30, 41, 59);
-          doc.setFontSize(fSize);
-          doc.setFont("helvetica", "bold");
-          var lTit = doc.splitTextToSize(item.nome, sQr ? cardW - 18 : cardW - 6);
-          doc.text(lTit.shift() || item.nome, x + 3, tY);
-
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(fSize - 1);
-          var esp = (fSize * 0.4) * lHeight;
-
-          if (sPreco && item.preco) {
-            tY += esp;
-            doc.setTextColor(22, 163, 74);
-            doc.setFont("helvetica", "bold");
-            doc.text(item.preco, x + 3, tY);
-          }
-
-          doc.setTextColor(100, 116, 139);
-          doc.setFont("helvetica", "normal");
-          if (sSku && item.sku) { tY += esp; doc.text("Ref: " + item.sku, x + 3, tY); }
-          if (sSpecs && item.specs) { tY += esp; doc.text(item.specs.substring(0, 28), x + 3, tY); }
-
-          if (sQr) {
-            var qr = await gerarQr(item.link || site);
-            if (qr) doc.addImage(qr, "PNG", x + cardW - 15, y + cardH - 15, 13, 13);
-          }
-
-          col++;
-          if (col >= cols) { col = 0; y += cardH + gap; }
-        }
-        rodape();
-      }
-
-      doc.save("Catalogo_" + loja.replace(/\s+/g, "_") + ".pdf");
-    } catch (err) {
-      alert("Erro ao gerar PDF: " + err.message);
-    } finally {
-      btn.innerText = "📄 BAIXAR PDF";
-      btn.disabled = false;
-    }
-  }
-
-  document.getElementById("btnGerar").addEventListener("click", gerarPDF);
-  document.getElementById("btnModa").addEventListener("click", function() { setNicho("moda"); });
-  document.getElementById("btnOtica").addEventListener("click", function() { setNicho("otica"); });
-  document.getElementById("btnRest").addEventListener("click", function() { setNicho("restaurante"); });
-  document.getElementById("logoLoja").addEventListener("change", lerLogo);
-  document.getElementById("btnExtrair").addEventListener("click", extrairSite);
-  document.getElementById("btnProcessarColado").addEventListener("click", processarColado);
-  document.getElementById("btnAddManual").addEventListener("click", addManual);
-  document.getElementById("btnLimpar").addEventListener("click", limparLista);
-
-  renderizarLista();
-
-  var badge = document.getElementById("badgeStatus");
-  badge.innerText = "🟢 v7.0 Pronto";
-  badge.style.background = "#dcfce7";
-  badge.style.color = "#15803d";
+  doc.setFillColor(30,41,59);doc.rect(w-88,h-15,38,8,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-69,h-9.5,{align:"center"});doc.link(w-88,h-15,38,8,{url:site});
+  doc.setFillColor(22,163,74);doc.rect(w-48,h-15,38,8,"F");doc.text("WHATSAPP",w-29,h-9.5,{align:"center"});doc.link(w-48,h-15,38,8,{url:wpp});
+  doc.save("Catalogo.pdf");
+};
+var st=document.getElementById("st");st.innerText="🟢 v8.0 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
-
