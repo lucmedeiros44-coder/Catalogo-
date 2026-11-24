@@ -1,169 +1,193 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Catálogo Pro PDF</title>
-<script src="https://tailwindcss.com"></script>
 <script src="https://cloudflare.com"></script>
 <script src="https://cloudflare.com"></script>
+<style>
+  * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { margin: 0; background: #f3f4f6; color: #1f2937; }
+  .login-box { min-height: 100vh; background: #0f172a; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .login-card { background: #fff; padding: 24px; border-radius: 16px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+  .container { max-width: 1100px; margin: 0 auto; padding: 14px; }
+  .card { background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
+  input[type="text"], input[type="url"], input[type="number"], input[type="password"], select {
+    width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827;
+  }
+  button { cursor: pointer; border: none; border-radius: 8px; font-weight: 700; padding: 10px 14px; font-size: 13px; }
+  .btn-blue { background: #2563eb; color: #fff; }
+  .btn-green { background: #16a34a; color: #fff; }
+  .btn-indigo { background: #4f46e5; color: #fff; }
+  .btn-gray { background: #e5e7eb; color: #374151; }
+  .hidden { display: none !important; }
+  .item-row { display: flex; justify-content: space-between; align-items: center; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; margin-bottom: 6px; background: #f9fafb; }
+</style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans">
+<body>
 
-<div id="telaLogin" class="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
-    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">PDF</div>
-    <h2 class="text-xl font-bold text-gray-900">Catálogo Pro PDF</h2>
-    <p class="text-xs text-gray-500 mb-4">Digite sua chave de acesso</p>
-    <input type="password" id="inputSenha" placeholder="Senha..." class="w-full border rounded-lg p-3 text-center font-semibold mb-3 outline-none">
-    <button type="button" onclick="verificarSenha()" class="w-full bg-blue-600 active:bg-blue-800 text-white font-bold py-3 rounded-lg">Entrar</button>
-    <p id="erroSenha" class="text-xs text-red-600 font-semibold mt-2 hidden">Senha incorreta.</p>
+<div id="telaLogin" class="login-box">
+  <div class="login-card">
+    <h2 style="margin:0 0 6px 0;">Catálogo Pro PDF</h2>
+    <p style="font-size:12px; color:#6b7280; margin:0 0 16px 0;">Digite sua chave de acesso</p>
+    <input type="password" id="inputSenha" placeholder="Senha..." style="text-align:center; margin-bottom:12px;">
+    <button type="button" onclick="entrar()" class="btn-blue" style="width:100%; padding:12px;">Entrar no Gerador</button>
+    <p id="erroSenha" class="hidden" style="color:#dc2626; font-size:12px; margin-top:8px;">Senha incorreta.</p>
   </div>
 </div>
 
-<div id="painelApp" class="max-w-6xl mx-auto p-4 hidden">
-  <header class="bg-white p-4 rounded-xl shadow-sm mb-4 flex justify-between items-center">
+<div id="painelApp" class="container hidden">
+  <div class="card header">
     <div>
-      <h1 class="text-lg font-bold text-gray-900">Catálogo Pro PDF</h1>
-      <p class="text-xs text-gray-500">Moda • Óticas • Restaurantes</p>
+      <h1 style="margin:0; font-size:18px;">Catálogo Pro PDF</h1>
+      <span style="font-size:12px; color:#6b7280;">Moda Feminina • Óticas • Restaurantes</span>
     </div>
-    <div class="flex gap-2">
-      <button type="button" onclick="gerarPDF()" class="bg-green-600 active:bg-green-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm">📄 BAIXAR PDF</button>
-      <button type="button" onclick="sairApp()" class="bg-gray-200 text-gray-700 font-semibold py-2.5 px-3 rounded-lg text-xs">Sair</button>
+    <div style="display:flex; gap:8px;">
+      <button type="button" onclick="gerarPDF()" class="btn-green">📄 BAIXAR PDF</button>
+      <button type="button" onclick="sair()" class="btn-gray">Sair</button>
     </div>
-  </header>
+  </div>
 
-  <section class="bg-white p-4 rounded-xl shadow-sm mb-4 border-l-4 border-blue-600 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-    <div>
-      <label class="block text-xs font-bold text-gray-700 mb-1">1. NOME DA LOJA</label>
-      <input type="text" id="nomeLoja" value="Loja Simone Lit" class="w-full border rounded p-2 text-sm bg-white">
+  <div class="card" style="border-left: 4px solid #2563eb;">
+    <div class="grid-4">
+      <div>
+        <label>1. NOME DA LOJA</label>
+        <input type="text" id="nomeLoja" value="Loja Simone Lit">
+      </div>
+      <div>
+        <label>2. LINK DO SITE</label>
+        <input type="url" id="linkSite" value="https://simonelit.com">
+      </div>
+      <div>
+        <label>3. NÚMERO WHATSAPP</label>
+        <input type="text" id="numWhatsapp" value="553132843022">
+      </div>
+      <div>
+        <label>4. TOTAL DE PRODUTOS</label>
+        <input type="number" id="totalProdutos" value="12" min="1" max="300">
+      </div>
     </div>
-    <div>
-      <label class="block text-xs font-bold text-gray-700 mb-1">2. LINK DO SITE</label>
-      <input type="url" id="linkSite" value="https://simonelit.com" class="w-full border rounded p-2 text-sm bg-white">
-    </div>
-    <div>
-      <label class="block text-xs font-bold text-gray-700 mb-1">3. NÚMERO WHATSAPP</label>
-      <input type="text" id="numWhatsapp" value="553132843022" class="w-full border rounded p-2 text-sm bg-white">
-    </div>
-    <div>
-      <label class="block text-xs font-bold text-gray-700 mb-1">4. TOTAL DE PRODUTOS</label>
-      <input type="number" id="totalProdutos" value="12" min="1" max="300" class="w-full border rounded p-2 text-sm bg-white">
-    </div>
-  </section>
+  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-    <div class="lg:col-span-5 space-y-4">
-      <div class="bg-white p-4 rounded-xl shadow-sm">
-        <h2 class="font-bold text-sm mb-2 border-b pb-1">Perfil Rápido (Nicho)</h2>
-        <div class="grid grid-cols-3 gap-2">
-          <button type="button" onclick="carregarNicho('moda')" class="py-2 rounded border text-xs font-bold bg-pink-50 border-pink-400 text-pink-700">👗 Moda</button>
-          <button type="button" onclick="carregarNicho('otica')" class="py-2 rounded border text-xs font-bold">👓 Ótica</button>
-          <button type="button" onclick="carregarNicho('restaurante')" class="py-2 rounded border text-xs font-bold">🍽️ Restaurante</button>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <label>Perfil Rápido (Nicho)</label>
+        <div class="grid-3">
+          <button type="button" onclick="setNicho('moda')" class="btn-gray">👗 Moda</button>
+          <button type="button" onclick="setNicho('otica')" class="btn-gray">👓 Ótica</button>
+          <button type="button" onclick="setNicho('restaurante')" class="btn-gray">🍽️ Restaurante</button>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
-        <h2 class="font-bold text-sm border-b pb-1">Capa, Logo e Grade</h2>
-        <input type="file" id="logoLoja" accept="image/*" onchange="carregarLogo(event)" class="text-xs w-full">
-        <div class="flex items-center justify-between gap-2 bg-gray-50 p-2 rounded border">
-          <label class="flex items-center gap-1 text-xs font-bold"><input type="checkbox" id="incluirCapa" checked> Capa</label>
-          <input type="text" id="tituloCapa" value="COLEÇÃO ATUAL" class="border rounded p-1 text-xs w-40 bg-white">
+      <div class="card">
+        <label>Logo, Capa e Grade</label>
+        <input type="file" id="logoLoja" accept="image/*" onchange="lerLogo(event)" style="margin-bottom:10px; font-size:12px;">
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+          <input type="checkbox" id="incluirCapa" checked style="width:auto;">
+          <span style="font-size:13px; font-weight:bold;">Capa:</span>
+          <input type="text" id="tituloCapa" value="COLEÇÃO ATUAL">
         </div>
-        <select id="tipoGrade" class="w-full border rounded p-2 text-sm bg-white">
+        <label>Produtos por Página</label>
+        <select id="tipoGrade">
           <option value="1">1 Produto Grande por Página</option>
           <option value="2" selected>2 Produtos por Linha (Padrão)</option>
           <option value="3">3 Produtos por Linha (Compacto)</option>
         </select>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm space-y-3">
-        <h2 class="font-bold text-sm border-b pb-1">Cores, Fontes e Rodapé</h2>
-        <div class="grid grid-cols-3 gap-2">
-          <div><label class="text-xs font-bold">Cor</label><input type="color" id="corPrincipal" value="#1e293b" class="w-full h-8 border rounded"></div>
-          <div><label class="text-xs font-bold">Fonte</label><input type="number" id="tamanhoFonte" value="11" class="w-full border rounded p-1.5 text-sm bg-white"></div>
-          <div><label class="text-xs font-bold">Linha</label><input type="number" id="alturaLinha" value="1.3" step="0.1" class="w-full border rounded p-1.5 text-sm bg-white"></div>
+      <div class="card">
+        <label>Cores, Fontes e Rodapé</label>
+        <div class="grid-3" style="margin-bottom:10px;">
+          <div><label>Cor</label><input type="color" id="corPrincipal" value="#1e293b" style="width:100%; height:38px;"></div>
+          <div><label>Fonte</label><input type="number" id="tamanhoFonte" value="11"></div>
+          <div><label>Linha</label><input type="number" id="alturaLinha" value="1.3" step="0.1"></div>
         </div>
-        <input type="text" id="textoRodape" value="Toque nas fotos para comprar no site ou peça pelo WhatsApp" class="w-full border rounded p-2 text-xs bg-white">
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <label><input type="checkbox" id="attrPreco" checked> Preço</label>
-          <label><input type="checkbox" id="attrSku" checked> Ref/SKU</label>
-          <label><input type="checkbox" id="attrSpecs" checked> Tamanhos</label>
-          <label><input type="checkbox" id="attrQr" checked> QR Code</label>
+        <label>Texto do Rodapé</label>
+        <input type="text" id="textoRodape" value="Toque nas fotos para comprar no site ou peça pelo WhatsApp" style="margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:13px;">
+          <span><input type="checkbox" id="attrPreco" checked> Preço</span>
+          <span><input type="checkbox" id="attrSku" checked> Ref/SKU</span>
+          <span><input type="checkbox" id="attrSpecs" checked> Tamanhos</span>
+          <span><input type="checkbox" id="attrQr" checked> QR Code</span>
         </div>
       </div>
     </div>
 
-    <div class="lg:col-span-7 space-y-4">
-      <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200">
-        <h2 class="font-bold text-sm text-indigo-900 mb-2">🚀 Extrair Direto do Site</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-          <input type="url" id="urlExtracao" value="https://simonelit.com" class="sm:col-span-6 bg-white border rounded p-2 text-sm">
-          <input type="number" id="itensPorCat" value="3" min="1" max="15" class="sm:col-span-2 bg-white border rounded p-2 text-sm text-center">
-          <button type="button" onclick="extrairMultiCategorias()" id="btnExtrairMulti" class="sm:col-span-4 bg-indigo-600 text-white font-bold py-2 px-3 rounded text-xs">Extrair Catálogo</button>
+    <div>
+      <div class="card" style="background:#eef2ff; border:1px solid #c7d2fe;">
+        <label style="color:#312e81;">🚀 Extrair Direto do Site da Loja</label>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <input type="url" id="urlExtracao" value="https://simonelit.com" style="flex:2; min-width:160px;">
+          <input type="number" id="itensPorCat" value="3" min="1" max="15" style="width:60px; text-align:center;" title="Itens por categoria">
+          <button type="button" onclick="extrairSite()" id="btnExtrair" class="btn-indigo">Extrair Catálogo</button>
         </div>
-        <div id="statusExtracao" class="text-xs font-medium mt-2 hidden"></div>
+        <p id="statusExtracao" class="hidden" style="font-size:12px; margin:8px 0 0 0; font-weight:bold;"></p>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm space-y-2">
-        <h2 class="font-bold text-sm border-b pb-1">Adicionar Item Manualmente</h2>
-        <div class="grid grid-cols-3 gap-2">
-          <input type="text" id="prodNome" placeholder="Nome" class="border rounded p-2 text-xs bg-white">
-          <input type="text" id="prodCat" placeholder="Categoria" class="border rounded p-2 text-xs bg-white">
-          <input type="text" id="prodPreco" placeholder="R$ 0,00" class="border rounded p-2 text-xs bg-white">
+      <div class="card">
+        <label>Adicionar Item Manualmente</label>
+        <div class="grid-3" style="margin-bottom:8px;">
+          <input type="text" id="prodNome" placeholder="Nome">
+          <input type="text" id="prodCat" placeholder="Categoria">
+          <input type="text" id="prodPreco" placeholder="R$ 0,00">
         </div>
-        <div class="grid grid-cols-3 gap-2">
-          <input type="text" id="prodSku" placeholder="Ref/SKU" class="border rounded p-2 text-xs bg-white">
-          <input type="text" id="prodSpecs" placeholder="Detalhes" class="border rounded p-2 text-xs bg-white">
-          <input type="url" id="prodLink" placeholder="Link" class="border rounded p-2 text-xs bg-white">
+        <div class="grid-3" style="margin-bottom:8px;">
+          <input type="text" id="prodSku" placeholder="Ref/SKU">
+          <input type="text" id="prodSpecs" placeholder="Detalhes">
+          <input type="url" id="prodLink" placeholder="Link">
         </div>
-        <div class="flex gap-2 items-center">
-          <input type="file" id="prodImagem" accept="image/*" class="text-xs w-full">
-          <button type="button" onclick="adicionarProduto()" class="bg-blue-600 text-white font-bold py-2 px-4 rounded text-xs shrink-0">+ Add</button>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="file" id="prodImagem" accept="image/*" style="font-size:12px; flex:1;">
+          <button type="button" onclick="addManual()" class="btn-blue">+ Add</button>
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-xl shadow-sm">
-        <div class="flex justify-between items-center border-b pb-1 mb-2">
-          <h2 class="font-bold text-sm">Itens (<span id="contadorItens">0</span>)</h2>
-          <button type="button" onclick="produtos=[];renderizarLista()" class="text-xs text-red-600">Limpar</button>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <label style="margin:0;">Itens no Catálogo (<span id="contItens">0</span>)</label>
+          <button type="button" onclick="produtos=[];renderLista()" class="btn-gray" style="padding:4px 8px; font-size:11px;">Limpar</button>
         </div>
-        <div id="listaProdutos" class="space-y-2 max-h-80 overflow-y-auto"></div>
+        <div id="listaProdutos" style="max-height:320px; overflow-y:auto;"></div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const SENHA_MESTRA = "vip2026";
-const IMG_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABmJLR0QA/wD/AP+gvaeTAAABJElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcAz0AAAd654/gAAAAASUVORK5CYII=";
-let logoBase64 = null;
-let produtos = [];
+var SENHA_APP = "vip2026";
+var IMG_VAZIA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAYAAACtWK6eAAAABmJLR0QA/wD/AP+gvaeTAAABJElEQVR4nO3BMQEAAADCoPVPbQ0PoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcAz0AAAd654/gAAAAASUVORK5CYII=";
+var logoBase64 = null;
+var produtos = [];
 
-function verificarSenha() {
-  const val = document.getElementById('inputSenha').value.trim();
-  if (val === SENHA_MESTRA) {
-    try { localStorage.setItem('catalogo_pro_auth', 'ok'); } catch(e) {}
-    liberarPainel();
+function entrar() {
+  var s = document.getElementById('inputSenha').value.trim();
+  if (s === SENHA_APP) {
+    try { localStorage.setItem('cat_auth', '1'); } catch(e) {}
+    mostrarApp();
   } else {
     document.getElementById('erroSenha').classList.remove('hidden');
   }
 }
 
-function liberarPainel() {
-  const login = document.getElementById('telaLogin');
-  const painel = document.getElementById('painelApp');
-  if (login) login.remove();
-  if (painel) painel.classList.remove('hidden');
+function mostrarApp() {
+  document.getElementById('telaLogin').classList.add('hidden');
+  document.getElementById('painelApp').classList.remove('hidden');
 }
 
-function sairApp() {
-  try { localStorage.removeItem('catalogo_pro_auth'); } catch(e) {}
+function sair() {
+  try { localStorage.removeItem('cat_auth'); } catch(e) {}
   location.reload();
 }
 
-try {
-  if (localStorage.getItem('catalogo_pro_auth') === 'ok') liberarPainel();
-} catch(e) {}
+try { if (localStorage.getItem('cat_auth') === '1') mostrarApp(); } catch(e) {}
 
+function setNicho(tipo) {
+  if (tipo === 'moda') {
+    document.getElementById('nomeLoja').value = "Loja Simone Lit";
