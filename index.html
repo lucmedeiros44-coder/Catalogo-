@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18</title>
-<script src="https://jsdelivr.net"></script>
+<title>Lookbook PDF v20</title>
 <style>
   *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
   .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
@@ -13,6 +11,7 @@
   label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
   input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
   button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
+  button:disabled{opacity:0.6;cursor:not-allowed}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
   .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
   .item img{width:100%;height:100%;object-fit:cover}
@@ -22,8 +21,11 @@
 <body>
 <div class="box">
   <div class="card" style="display:flex;justify-content:space-between;align-items:center">
-    <div><b style="font-size:18px">Lookbook PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
-    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
+    <div>
+      <b style="font-size:18px">Lookbook PDF</b> 
+      <span id="st" style="font-size:11px;background:#fef3c7;color:#b45309;padding:3px 7px;border-radius:6px">🟡 Carregando biblioteca...</span>
+    </div>
+    <button id="bPdf" style="background:#16a34a" disabled>📄 BAIXAR PDF</button>
   </div>
   <div class="card g3">
     <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
@@ -43,7 +45,7 @@
       <button id="bAdd" style="background:#2563eb">+ Adicionar</button>
     </div>
     <div style="display:flex;gap:6px">
-      <input id="uImg" placeholder="Ou cole o link direto da foto (https://...)">
+      <input id="uImg" placeholder="Ou cole o link direto da foto">
       <button id="bUrl" style="background:#4f46e5">+ Link Foto</button>
     </div>
   </div>
@@ -52,60 +54,174 @@
     <div id="grid" class="grid"></div>
   </div>
 </div>
+
 <script>
-window.onerror=function(m,u,l){document.getElementById("st").innerText="⚠️ L"+l+": "+m;};
-var itens=[];
-function render(){
-  document.getElementById("qtd").innerText=itens.length;
-  document.getElementById("grid").innerHTML=itens.map(function(it,i){return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';}).join("");
-}
-document.getElementById("bAdd").onclick=function(){
-  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha foto(s).");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({img:e.target.result,l:l});render();};r.readAsDataURL(file);});
-  f.value="";
+window.onerror = function(m, u, l) {
+  var st = document.getElementById("st");
+  st.innerText = "⚠️ L" + l + ": " + m;
+  st.style.background = "#fee2e2";
+  st.style.color = "#dc2626";
 };
-document.getElementById("bUrl").onclick=function(){
-  var u=document.getElementById("uImg").value.trim();if(!u)return alert("Cole o link da foto.");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  itens.push({img:u,l:l});document.getElementById("uImg").value="";render();
+
+var sc = document.createElement("script");
+sc.src = "https://cloudflare.com";
+sc.onload = function() {
+  var st = document.getElementById("st");
+  st.innerText = "🟢 v20 Ativo";
+  st.style.background = "#dcfce7";
+  st.style.color = "#15803d";
+  document.getElementById("bPdf").disabled = false;
 };
-document.getElementById("bLimpar").onclick=function(){itens=[];render();};
-function toB64(u){
-  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
-  return fetch("https://"+"images.weserv.nl/?url="+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
-    .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
+sc.onerror = function() {
+  var st = document.getElementById("st");
+  st.innerText = "🔴 Falha ao carregar jsPDF";
+  st.style.background = "#fee2e2";
+  st.style.color = "#dc2626";
+};
+document.head.appendChild(sc);
+
+var itens = [];
+
+function render() {
+  document.getElementById("qtd").innerText = itens.length;
+  document.getElementById("grid").innerHTML = itens.map(function(it, i) {
+    return '<div class="item"><img src="' + it.img + '"><button class="del" onclick="itens.splice(' + i + ',1);render()">✕</button></div>';
+  }).join("");
 }
-document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Adicione fotos primeiro.");
-  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
-  try{
-    var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-    if(!Ctor)throw new Error("Aguarde 2s e clique novamente (carregando PDF).");
-    var doc=new Ctor(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
-    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://"+"wa.me/"+document.getElementById("wpp").value.replace(/\D/g,"");
-    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-    var cols=parseInt(document.getElementById("col").value)||2;
-    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
-    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
-    var rodape=function(){
-      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
-      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
+
+document.getElementById("bAdd").onclick = function() {
+  var f = document.getElementById("fImg");
+  if (!f.files || !f.files.length) return alert("Escolha foto(s).");
+  var l = document.getElementById("fLink").value.trim() || document.getElementById("site").value;
+  Array.from(f.files).forEach(function(file) {
+    var r = new FileReader();
+    r.onload = function(e) {
+      itens.push({ img: e.target.result, l: l });
+      render();
     };
-    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
-    for(var i=0;i<itens.length;i++){
-      var it=itens.slice(i,i+1).shift();
-      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
-      var x=m+col*(cw+gap),b64=await toB64(it.img);
-      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
-      doc.link(x,y,cw,ch,{url:it.l||site});
-      col++;if(col>=cols){col=0;y+=ch+gap;}
-    }
-    rodape();doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
-  }catch(e){alert("Erro: "+e.message);}
-  btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
+    r.readAsDataURL(file);
+  });
+  f.value = "";
 };
-var st=document.getElementById("st");st.innerText="🟢 v18 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+
+document.getElementById("bUrl").onclick = function() {
+  var u = document.getElementById("uImg").value.trim();
+  if (!u) return alert("Cole o link da foto.");
+  var l = document.getElementById("fLink").value.trim() || document.getElementById("site").value;
+  itens.push({ img: u, l: l });
+  document.getElementById("uImg").value = "";
+  render();
+};
+
+document.getElementById("bLimpar").onclick = function() {
+  itens = [];
+  render();
+};
+
+function toB64(u) {
+  if (!u || u.indexOf("data:image") === 0) return Promise.resolve(u);
+  var px = "https://weserv.nl" + encodeURIComponent(u.replace(/^https?:\/\//, "")) + "&w=600&output=jpg";
+  return fetch(px)
+    .then(function(r) { return r.ok ? r.blob() : null; })
+    .then(function(b) {
+      return b ? new Promise(function(res) {
+        var rd = new FileReader();
+        rd.onloadend = function() { res(rd.result); };
+        rd.readAsDataURL(b);
+      }) : null;
+    })
+    .catch(function() { return null; });
+}
+
+document.getElementById("bPdf").onclick = function() {
+  if (!itens.length) return alert("Adicione fotos primeiro.");
+  var Ctor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+  if (!Ctor) return alert("Biblioteca ainda não carregada. Recarregue a página.");
+  
+  var btn = this;
+  btn.innerText = "Gerando...";
+  btn.disabled = true;
+
+  Promise.all(itens.map(function(it) {
+    return toB64(it.img).then(function(b) { return { b: b, l: it.l }; });
+  })).then(function(prontos) {
+    var doc = new Ctor();
+    var w = doc.internal.pageSize.getWidth();
+    var h = doc.internal.pageSize.getHeight();
+    var loja = document.getElementById("loja").value;
+    var site = document.getElementById("site").value;
+    var wpp = "https://wa.me" + document.getElementById("wpp").value.replace(/\D/g, "");
+    var hex = document.getElementById("cor").value.replace("#", "");
+    var n = parseInt(hex, 16);
+    var r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    var cols = parseInt(document.getElementById("col").value) || 2;
+
+    doc.setFillColor(r, g, b);
+    doc.rect(0, 0, w, h, "F");
+    doc.setTextColor(255);
+    doc.setFontSize(26);
+    doc.text(loja.toUpperCase(), w / 2, 125, { align: "center" });
+    doc.setFontSize(13);
+    doc.text(document.getElementById("capa").value.toUpperCase(), w / 2, 140, { align: "center" });
+
+    var rodape = function() {
+      doc.setFillColor(r, g, b);
+      doc.roundedRect(w - 92, h - 17, 40, 9, 2, 2, "F");
+      doc.setTextColor(255);
+      doc.setFontSize(8);
+      doc.text("VER NO SITE", w - 72, h - 11, { align: "center" });
+      doc.link(w - 92, h - 17, 40, 9, { url: site });
+
+      doc.setFillColor(22, 163, 74);
+      doc.roundedRect(w - 50, h - 17, 40, 9, 2, 2, "F");
+      doc.text("WHATSAPP", w - 30, h - 11, { align: "center" });
+      doc.link(w - 50, h - 17, 40, 9, { url: wpp });
+    };
+
+    doc.addPage();
+    var m = 10, gap = 6;
+    var cw = (w - m * 2 - gap * (cols - 1)) / cols;
+    var ch = cols === 1 ? 220 : (cols === 2 ? 115 : 78);
+    var col = 0, y = 14;
+
+    for (var i = 0; i < prontos.length; i++) {
+      var it = prontos[i];
+      if (y + ch > h - 22) {
+        rodape();
+        doc.addPage();
+        y = 14;
+        col = 0;
+      }
+      var x = m + col * (cw + gap);
+      if (it.b) {
+        try {
+          doc.addImage(it.b, x, y, cw, ch);
+        } catch (e) {
+          doc.setFillColor(240);
+          doc.rect(x, y, cw, ch, "F");
+        }
+      } else {
+        doc.setFillColor(240);
+        doc.rect(x, y, cw, ch, "F");
+      }
+      doc.link(x, y, cw, ch, { url: it.l || site });
+      col++;
+      if (col >= cols) {
+        col = 0;
+        y += ch + gap;
+      }
+    }
+    
+    rodape();
+    doc.save("Lookbook_" + loja.replace(/\s+/g, "_") + ".pdf");
+    btn.innerText = "📄 BAIXAR PDF";
+    btn.disabled = false;
+  }).catch(function(e) {
+    alert("Erro: " + e.message);
+    btn.innerText = "📄 BAIXAR PDF";
+    btn.disabled = false;
+  });
+};
 </script>
 </body>
 </html>
