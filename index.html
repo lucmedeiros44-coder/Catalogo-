@@ -1,110 +1,212 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18</title>
-<script src="https://jsdelivr.net"></script>
-<style>
-  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
-  .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
-  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-  input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
-  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
-  .item img{width:100%;height:100%;object-fit:cover}
-  .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lookbook PDF v20</title>
+  <script src="https://jsdelivr.net"></script>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { margin: 0; background: #f3f4f6; color: #1f2937; padding-bottom: 40px; }
+    .box { max-width: 920px; margin: 0 auto; padding: 12px; }
+    .card { background: #fff; padding: 16px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
+    input, select, textarea { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 7px; font-size: 14px; }
+    button { cursor: pointer; border: none; border-radius: 7px; font-weight: 700; padding: 10px 14px; font-size: 13px; color: #fff; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 12px; }
+    .item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; display: flex; flex-direction: column; }
+    .item-img { aspect-ratio: 3/4; background: #f9fafb; overflow: hidden; position: relative; }
+    .item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .item-info { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+    .item-info input { padding: 5px 7px; font-size: 12px; }
+    .del { position: absolute; top: 6px; right: 6px; background: rgba(220, 38, 38, 0.9); color: #fff; border-radius: 50%; width: 24px; height: 24px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  </style>
 </head>
 <body>
-<div class="box">
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center">
-    <div><b style="font-size:18px">Lookbook PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
-    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
-  </div>
-  <div class="card g3">
-    <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
-    <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
-    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
-  </div>
-  <div class="card g3">
-    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
-    <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
-    <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
-  </div>
-  <div class="card">
-    <label>Adicionar Foto(s) + Link do Produto</label>
-    <div class="g3" style="margin-bottom:8px">
-      <input type="file" id="fImg" accept="image/*" multiple>
-      <input id="fLink" placeholder="Link do produto no site">
-      <button id="bAdd" style="background:#2563eb">+ Adicionar</button>
+  <div class="box">
+    <!-- Cabeçalho -->
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div>
+        <b style="font-size:18px">Lookbook PDF</b>
+        <span id="st" style="font-size:11px;background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:6px;margin-left:6px">⏳ Carregando...</span>
+      </div>
+      <button id="bPdf" style="background:#16a34a;font-size:14px;padding:11px 18px">📄 BAIXAR PDF</button>
     </div>
-    <div style="display:flex;gap:6px">
-      <input id="uImg" placeholder="Ou cole o link direto da foto (https://...)">
-      <button id="bUrl" style="background:#4f46e5">+ Link Foto</button>
+
+    <!-- Dados da Loja -->
+    <div class="card g3">
+      <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
+      <div><label>Site Principal</label><input id="site" value="https://simonelit.com"></div>
+      <div><label>WhatsApp (com DDI)</label><input id="wpp" value="553132843022"></div>
+    </div>
+
+    <!-- Configurações de Layout -->
+    <div class="card g3">
+      <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
+      <div>
+        <label>Fotos por Linha</label>
+        <select id="col">
+          <option value="1">1 Grande (Destaque)</option>
+          <option value="2" selected>2 Padrão (Catálogo)</option>
+          <option value="3">3 Compacto (Vitrine)</option>
+        </select>
+      </div>
+      <div><label>Título da Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
+    </div>
+
+    <!-- Captura Automática por Link da Página do Produto -->
+    <div class="card">
+      <label>Importar Produto(s) pelo Link da Página</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="pUrl" placeholder="Cole o link da página do produto (ex: https://simonelit.com)">
+        <button id="bBuscar" style="background:#2563eb;white-space:nowrap">🔍 Puxar Produto</button>
+      </div>
+      <div style="font-size:11px;color:#6b7280">
+        O sistema lê automaticamente a foto principal, o nome da peça e o preço a partir do link da página.
+      </div>
+    </div>
+
+    <!-- Grade de Itens -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <label style="margin:0">Produtos no Catálogo (<span id="qtd">0</span>)</label>
+        <button id="bLimpar" style="background:#dc2626;padding:5px 10px;font-size:11px">Limpar Tudo</button>
+      </div>
+      <div id="grid" class="grid"></div>
     </div>
   </div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
-    <div id="grid" class="grid"></div>
-  </div>
-</div>
-<script>
-window.onerror=function(m,u,l){document.getElementById("st").innerText="⚠️ L"+l+": "+m;};
-var itens=[];
-function render(){
-  document.getElementById("qtd").innerText=itens.length;
-  document.getElementById("grid").innerHTML=itens.map(function(it,i){return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';}).join("");
-}
-document.getElementById("bAdd").onclick=function(){
-  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha foto(s).");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({img:e.target.result,l:l});render();};r.readAsDataURL(file);});
-  f.value="";
-};
-document.getElementById("bUrl").onclick=function(){
-  var u=document.getElementById("uImg").value.trim();if(!u)return alert("Cole o link da foto.");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  itens.push({img:u,l:l});document.getElementById("uImg").value="";render();
-};
-document.getElementById("bLimpar").onclick=function(){itens=[];render();};
-function toB64(u){
-  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
-  return fetch("https://"+"images.weserv.nl/?url="+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
-    .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
-}
-document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Adicione fotos primeiro.");
-  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
-  try{
-    var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-    if(!Ctor)throw new Error("Aguarde 2s e clique novamente (carregando PDF).");
-    var doc=new Ctor(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
-    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://"+"wa.me/"+document.getElementById("wpp").value.replace(/\D/g,"");
-    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-    var cols=parseInt(document.getElementById("col").value)||2;
-    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
-    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
-    var rodape=function(){
-      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
-      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
+
+  <script>
+    window.onerror = function(m, u, l) {
+      var st = document.getElementById("st");
+      st.innerText = "⚠️ Erro L" + l + ": " + m;
+      st.style.background = "#fee2e2";
+      st.style.color = "#dc2626";
     };
-    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
-    for(var i=0;i<itens.length;i++){
-      var it=itens.slice(i,i+1).shift();
-      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
-      var x=m+col*(cw+gap),b64=await toB64(it.img);
-      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
-      doc.link(x,y,cw,ch,{url:it.l||site});
-      col++;if(col>=cols){col=0;y+=ch+gap;}
+
+    var itens = [];
+
+    function render() {
+      document.getElementById("qtd").innerText = itens.length;
+      if (!itens.length) {
+        document.getElementById("grid").innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:#9ca3af;font-size:13px">Nenhum produto importado ainda. Cole o link de um produto acima.</div>';
+        return;
+      }
+      document.getElementById("grid").innerHTML = itens.map(function(it, i) {
+        return '<div class="item">' +
+          '<div class="item-img">' +
+            '<img src="' + it.img + '" onerror="this.src=\'https://placehold.co\'">' +
+            '<button class="del" title="Remover" onclick="itens.splice(' + i + ',1);render()">✕</button>' +
+          '</div>' +
+          '<div class="item-info">' +
+            '<input value="' + (it.nome || '') + '" placeholder="Nome da peça" onchange="itens[' + i + '].nome=this.value">' +
+            '<input value="' + (it.preco || '') + '" placeholder="Preço" onchange="itens[' + i + '].preco=this.value">' +
+            '<input value="' + (it.l || '') + '" placeholder="Link do produto" onchange="itens[' + i + '].l=this.value">' +
+          '</div>' +
+        '</div>';
+      }).join("");
     }
-    rodape();doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
-  }catch(e){alert("Erro: "+e.message);}
-  btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
-};
-var st=document.getElementById("st");st.innerText="🟢 v18 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
-</script>
-</body>
-</html>
+
+    // Extrai foto (og:image), título (og:title) e preço da página do produto via proxy público
+    document.getElementById("bBuscar").onclick = async function() {
+      var url = document.getElementById("pUrl").value.trim();
+      if (!url) return alert("Cole o link da página do produto.");
+      if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+
+      var btn = this;
+      btn.innerText = "⏳ Buscando...";
+      btn.disabled = true;
+
+      try {
+        var res = await fetch("https://allorigins.win" + encodeURIComponent(url));
+        var data = await res.json();
+        if (!data || !data.contents) throw new Error("Não foi possível ler a página.");
+
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(data.contents, "text/html");
+
+        var getMeta = function(prop) {
+          var el = doc.querySelector('meta[property="' + prop + '"], meta[name="' + prop + '"]');
+          return el ? el.getAttribute("content") : "";
+        };
+
+        var img = getMeta("og:image") || getMeta("twitter:image");
+        var nome = (getMeta("og:title") || doc.title || "").split("-")[0].trim();
+        var preco = getMeta("product:price:amount") || getMeta("og:price:amount");
+        if (preco && !preco.includes("R$")) {
+          preco = "R$ " + parseFloat(preco).toFixed(2).replace(".", ",");
+        }
+
+        if (!img) throw new Error("Nenhuma imagem encontrada nesta página.");
+
+        itens.push({ img: img, l: url, nome: nome, preco: preco || "" });
+        document.getElementById("pUrl").value = "";
+        render();
+      } catch (e) {
+        alert("Falha ao importar produto: " + e.message);
+      }
+
+      btn.innerText = "🔍 Puxar Produto";
+      btn.disabled = false;
+    };
+
+    document.getElementById("bLimpar").onclick = function() {
+      if (itens.length && confirm("Deseja remover todos os produtos?")) {
+        itens = [];
+        render();
+      }
+    };
+
+    function prepararImagem(src) {
+      return new Promise(function(resolve) {
+        var finalUrl = "https://weserv.nl" + encodeURIComponent(src.replace(/^https?:\/\//, "")) + "&w=800&output=jpg";
+        var img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function() {
+          var canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          var ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0);
+          resolve({ data: canvas.toDataURL("image/jpeg", 0.85) });
+        };
+        img.onerror = function() { resolve(null); };
+        img.src = finalUrl;
+      });
+    }
+
+    document.getElementById("bPdf").onclick = async function() {
+      if (!itens.length) return alert("Importe pelo menos um produto primeiro.");
+      var btn = this;
+      btn.innerText = "⏳ Gerando PDF...";
+      btn.disabled = true;
+
+      try {
+        var Ctor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+        if (!Ctor) throw new Error("Biblioteca PDF não carregou.");
+
+        var doc = new Ctor();
+        var w = doc.internal.pageSize.getWidth();
+        var h = doc.internal.pageSize.getHeight();
+
+        var loja = document.getElementById("loja").value || "Lookbook";
+        var site = document.getElementById("site").value || "https://simonelit.com";
+        var wppNum = document.getElementById("wpp").value.replace(/\D/g, "");
+        var wpp = "https://wa.me" + wppNum;
+
+        var hex = document.getElementById("cor").value.replace("#", "");
+        var n = parseInt(hex, 16);
+        var r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+        var cols = parseInt(document.getElementById("col").value) || 2;
+
+        // CAPA
+        doc.setFillColor(r, g, b);
+        doc.rect(0, 0, w, h, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(28);
+
