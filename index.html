@@ -1,110 +1,157 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18</title>
-<script src="https://jsdelivr.net"></script>
-<style>
-  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
-  .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
-  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-  input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
-  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
-  .item img{width:100%;height:100%;object-fit:cover}
-  .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Catálogo PDF Profissional - Multi-Categorias</title>
+  <script src="https://tailwindcss.com"></script>
+  <script src="https://cloudflare.com"></script>
+  <script src="https://cloudflare.com"></script>
 </head>
-<body>
-<div class="box">
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center">
-    <div><b style="font-size:18px">Lookbook PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
-    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
-  </div>
-  <div class="card g3">
-    <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
-    <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
-    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
-  </div>
-  <div class="card g3">
-    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
-    <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
-    <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
-  </div>
-  <div class="card">
-    <label>Adicionar Foto(s) + Link do Produto</label>
-    <div class="g3" style="margin-bottom:8px">
-      <input type="file" id="fImg" accept="image/*" multiple>
-      <input id="fLink" placeholder="Link do produto no site">
-      <button id="bAdd" style="background:#2563eb">+ Adicionar</button>
-    </div>
-    <div style="display:flex;gap:6px">
-      <input id="uImg" placeholder="Ou cole o link direto da foto (https://...)">
-      <button id="bUrl" style="background:#4f46e5">+ Link Foto</button>
-    </div>
-  </div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
-    <div id="grid" class="grid"></div>
-  </div>
-</div>
-<script>
-window.onerror=function(m,u,l){document.getElementById("st").innerText="⚠️ L"+l+": "+m;};
-var itens=[];
-function render(){
-  document.getElementById("qtd").innerText=itens.length;
-  document.getElementById("grid").innerHTML=itens.map(function(it,i){return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';}).join("");
-}
-document.getElementById("bAdd").onclick=function(){
-  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha foto(s).");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({img:e.target.result,l:l});render();};r.readAsDataURL(file);});
-  f.value="";
-};
-document.getElementById("bUrl").onclick=function(){
-  var u=document.getElementById("uImg").value.trim();if(!u)return alert("Cole o link da foto.");
-  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
-  itens.push({img:u,l:l});document.getElementById("uImg").value="";render();
-};
-document.getElementById("bLimpar").onclick=function(){itens=[];render();};
-function toB64(u){
-  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
-  return fetch("https://"+"images.weserv.nl/?url="+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
-    .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
-}
-document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Adicione fotos primeiro.");
-  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
-  try{
-    var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
-    if(!Ctor)throw new Error("Aguarde 2s e clique novamente (carregando PDF).");
-    var doc=new Ctor(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
-    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://"+"wa.me/"+document.getElementById("wpp").value.replace(/\D/g,"");
-    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
-    var cols=parseInt(document.getElementById("col").value)||2;
-    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
-    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
-    var rodape=function(){
-      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
-      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
-    };
-    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
-    for(var i=0;i<itens.length;i++){
-      var it=itens.slice(i,i+1).shift();
-      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
-      var x=m+col*(cw+gap),b64=await toB64(it.img);
-      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
-      doc.link(x,y,cw,ch,{url:it.l||site});
-      col++;if(col>=cols){col=0;y+=ch+gap;}
-    }
-    rodape();doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
-  }catch(e){alert("Erro: "+e.message);}
-  btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
-};
-var st=document.getElementById("st");st.innerText="🟢 v18 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
-</script>
-</body>
-</html>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+  <div class="max-w-7xl mx-auto p-4 md:p-6">
+    <!-- Cabeçalho -->
+    <header class="bg-white p-6 rounded-xl shadow-sm mb-5 flex flex-col md:flex-row justify-between items-center border-b">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Gerador de Catálogo PDF Profissional</h1>
+        <p class="text-sm text-gray-500">Moda Feminina • Óticas • Restaurantes | Extração Multi-Categorias + Capa + QR Code</p>
+      </div>
+      <button onclick="gerarPDF()" class="mt-4 md:mt-0 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow transition flex items-center gap-2 cursor-pointer">
+        <span>📄 GERAR E BAIXAR PDF</span>
+      </button>
+    </header>
+
+    <!-- 4 JANELAS PRINCIPAIS DE PREENCHIMENTO RÁPIDO -->
+    <section class="bg-white p-5 rounded-xl shadow-sm mb-6 border-l-4 border-blue-600">
+      <h2 class="font-bold text-sm uppercase tracking-wider text-blue-700 mb-3">Configuração Principal da Loja</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <label class="block text-xs font-extrabold uppercase text-gray-700 mb-1">1. NOME DA LOJA</label>
+          <input type="text" id="nomeLoja" value="Loja Simone Lit" placeholder="Digite o nome da loja..." class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <label class="block text-xs font-extrabold uppercase text-gray-700 mb-1">2. LINK DO SITE</label>
+          <input type="url" id="linkSite" value="https://simonelit.com" placeholder="https://..." class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <label class="block text-xs font-extrabold uppercase text-gray-700 mb-1">3. NÚMERO WHATSAPP</label>
+          <input type="text" id="numWhatsapp" value="553132843022" placeholder="Ex: 5531999999999" class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+          <label class="block text-xs font-extrabold uppercase text-gray-700 mb-1">4. TOTAL DE PRODUTOS</label>
+          <input type="number" id="totalProdutos" value="18" min="1" max="500" placeholder="Qtd máxima no PDF" class="w-full bg-white border border-gray-300 rounded-md p-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+      </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- COLUNA ESQUERDA: PERSONALIZAÇÃO -->
+      <div class="lg:col-span-5 space-y-5">
+        
+        <!-- Seleção de Nicho -->
+        <div class="bg-white p-5 rounded-xl shadow-sm">
+          <h2 class="font-bold text-base mb-3 border-b pb-2">Perfil do Cliente (Nicho)</h2>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="carregarNicho('moda')" class="py-2 px-3 rounded-lg border font-medium text-sm bg-pink-50 border-pink-500 text-pink-700 hover:opacity-80 cursor-pointer">👗 Moda</button>
+            <button onclick="carregarNicho('otica')" class="py-2 px-3 rounded-lg border font-medium text-sm hover:bg-gray-50 cursor-pointer">👓 Ótica</button>
+            <button onclick="carregarNicho('restaurante')" class="py-2 px-3 rounded-lg border font-medium text-sm hover:bg-gray-50 cursor-pointer">🍽️ Restaurante</button>
+          </div>
+        </div>
+
+        <!-- Identidade Visual, Capa e Grade -->
+        <div class="bg-white p-5 rounded-xl shadow-sm space-y-3">
+          <h2 class="font-bold text-base border-b pb-2">Logo, Capa e Formato de Grade</h2>
+          
+          <div>
+            <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Upload Logo da Loja</label>
+            <input type="file" id="logoLoja" accept="image/*" onchange="carregarLogo(event)" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 w-full">
+          </div>
+
+          <div class="flex items-center justify-between bg-gray-50 p-2.5 rounded-lg border">
+            <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
+              <input type="checkbox" id="incluirCapa" checked class="w-4 h-4"> Incluir Página de Capa
+            </label>
+            <input type="text" id="tituloCapa" value="COLEÇÃO ATUAL • CATÁLOGO DIGITAL" placeholder="Subtítulo da Capa" class="border rounded p-1.5 text-xs w-44">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Seletor de Grade (Produtos por Página)</label>
+            <select id="tipoGrade" class="w-full border rounded-lg p-2.5 text-sm bg-white font-medium">
+              <option value="1">1 Produto Grande por Página (Estilo Revista / Destaque)</option>
+              <option value="2" selected>2 Produtos por Linha (Padrão Equilibrado)</option>
+              <option value="3">3 Produtos por Linha (Catálogo Compacto / Lista)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Design e Atributos -->
+        <div class="bg-white p-5 rounded-xl shadow-sm space-y-3">
+          <h2 class="font-bold text-base border-b pb-2">Cores, Fontes e Rodapé</h2>
+          
+          <div class="grid grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-gray-600 mb-1">Cor Principal</label>
+              <input type="color" id="corPrincipal" value="#1e293b" class="w-full h-9 rounded cursor-pointer border">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-600 mb-1">Tamanho Fonte</label>
+              <input type="number" id="tamanhoFonte" value="11" min="8" max="18" class="w-full border rounded-lg p-2 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-600 mb-1">Altura da Linha</label>
+              <input type="number" id="alturaLinha" value="1.3" step="0.1" min="1.0" max="2.5" class="w-full border rounded-lg p-2 text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Texto Extra no Rodapé</label>
+            <input type="text" id="textoRodape" value="Clique nas fotos para ver detalhes no site ou peça pelo WhatsApp" class="w-full border rounded-lg p-2 text-sm outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-gray-600 mb-1.5">Atributos Dinâmicos no Card</label>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <label class="flex items-center gap-2"><input type="checkbox" id="attrPreco" checked> Exibir Preço</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="attrSku" checked> Exibir Ref / SKU</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="attrSpecs" checked> Tamanhos / Cores</label>
+              <label class="flex items-center gap-2"><input type="checkbox" id="attrQr" checked> Incluir QR Code</label>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA: EXTRATOR MULTI-CATEGORIAS + LISTA -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Extração Automática Multi-Categorias -->
+        <div class="bg-indigo-50 p-5 rounded-xl shadow-sm border border-indigo-200">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="font-bold text-base text-indigo-900">🚀 Extrair Categorias Automaticamente do Site</h2>
+            <span class="text-xs bg-indigo-600 text-white px-2.5 py-0.5 rounded font-semibold">1 Clique</span>
+          </div>
+          <p class="text-xs text-indigo-800 mb-3">
+            Lê o menu da loja virtual (ex: <strong>https://simonelit.com</strong>), detecta todas as categorias e importa os produtos já organizados por página.
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-2 mb-2">
+            <input type="url" id="urlExtracao" value="https://simonelit.com" placeholder="https://lojadocliente.com.br" class="md:col-span-6 bg-white border border-indigo-300 rounded-lg p-2.5 text-sm outline-none">
+            <div class="md:col-span-3 flex items-center bg-white border border-indigo-300 rounded-lg px-2">
+              <span class="text-xs text-gray-500 mr-1">Itens/Cat:</span>
+              <input type="number" id="itensPorCat" value="4" min="1" max="20" class="w-full p-1.5 text-sm font-bold outline-none">
+            </div>
+            <button onclick="extrairMultiCategorias()" id="btnExtrairMulti" class="md:col-span-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-3 rounded-lg text-xs cursor-pointer transition">
+              Extrair Todo Catálogo
+            </button>
+          </div>
+          <div id="statusExtracao" class="text-xs font-medium mt-2 hidden"></div>
+        </div>
+
+        <!-- Adicionar Novo Produto Manualmente -->
