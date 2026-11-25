@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18.3</title>
+<title>Lookbook PDF v18.4</title>
 <script src="https://cloudflare.com"></script>
 <style>
 *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
 .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:13px}
+input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
 button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
 button:disabled{opacity:.6;cursor:not-allowed}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
 .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
 .item img{width:100%;height:100%;object-fit:cover}
 .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
+.step{background:#eff6ff;border:1px solid #bfdbfe;padding:10px;border-radius:8px;font-size:12px;color:#1e3a8a;margin-bottom:10px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -36,14 +37,22 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
   </div>
   <div class="card">
-    <label>Extrair Produtos do Site (Abra o site → Ctrl+U → Ctrl+A → Ctrl+C → Cole abaixo)</label>
+    <label>Extrator Rápido para Celular</label>
+    <div class="step">
+      <b>1.</b> Toque em <b>Copiar Extrator</b> e salve como URL de um Favorito no navegador.<br>
+      <b>2.</b> Abra o site da loja, digite o nome do favorito na barra de endereço e toque nele.<br>
+      <b>3.</b> Volte aqui e toque em <b>Colar e Importar</b>.
+      <div style="margin-top:8px">
+        <button id="bCopyBm" style="background:#4f46e5;padding:7px 12px;font-size:12px">📋 Copiar Extrator (1ª vez)</button>
+      </div>
+    </div>
     <div style="display:flex;gap:8px">
-      <textarea id="htmlRaw" rows="2" placeholder="Cole aqui o código-fonte (Ctrl+U) da página da loja ou categoria..."></textarea>
-      <button id="bExtrair" style="background:#2563eb;white-space:nowrap">⚡ EXTRAIR</button>
+      <input id="dadosColados" placeholder="Toque aqui e cole os dados capturados...">
+      <button id="bImportar" style="background:#2563eb;white-space:nowrap">⚡ Importar</button>
     </div>
   </div>
   <div class="card">
-    <div style="display:flex;justify-content:space-between"><label>Produtos Extraídos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div style="display:flex;justify-content:space-between"><label>Produtos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
     <div id="grid" class="grid"></div>
   </div>
 </div>
@@ -56,37 +65,28 @@ function render(){
 }
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
 
-document.getElementById("bExtrair").onclick=function(){
-  var raw=document.getElementById("htmlRaw").value.trim();
-  var siteUrl=document.getElementById("site").value.trim()||"https://simonelit.com";
-  if(!/^https?:\/\//i.test(siteUrl))siteUrl="https://"+siteUrl;
-  if(!raw)return alert("Cole o código-fonte (Ctrl+U) da página primeiro.");
+var bmCode="javascript:(function(){var v={},r=[];document.querySelectorAll('a[href]').forEach(function(a){var i=a.querySelector('img');if(!i)return;var s=i.getAttribute('data-src')||i.getAttribute('data-lazy')||i.currentSrc||i.src||'';if(s.indexOf('//')===0)s='https:'+s;if(!s||s.indexOf('data:')===0||/logo|icon|banner|flag|svg|payment/i.test(s))return;var l=a.href;if(l===location.origin+'/'||/#|javascript:|wa\.me/i.test(l))return;if(!v[l]){v[l]=1;r.push({img:s,l:l});}});if(!r.length)return alert('Nenhum produto encontrado.');var t=JSON.stringify(r);navigator.clipboard.writeText(t).then(function(){alert('✅ '+r.length+' produtos copiados! Volte ao Lookbook PDF e cole.');}).catch(function(){prompt('Copie o código abaixo:',t);});})();";
+
+document.getElementById("bCopyBm").onclick=function(){
+  navigator.clipboard.writeText(bmCode).then(function(){
+    alert("✅ Código copiado!\n\nAgora crie um Favorito nesta página, edite o endereço (URL) dele, apague tudo e cole o código copiado.");
+  }).catch(function(){
+    prompt("Copie o código abaixo para salvar nos favoritos:",bmCode);
+  });
+};
+
+document.getElementById("bImportar").onclick=function(){
+  var txt=document.getElementById("dadosColados").value.trim();
+  if(!txt)return alert("Cole os dados capturados na caixa primeiro.");
   try{
-    var doc=new DOMParser().parseFromString(raw,"text/html");
-    var base=new URL(siteUrl);
-    var vistos={},novos=[];
-    doc.querySelectorAll("a[href]").forEach(function(a){
-      var img=a.querySelector("img");
-      if(!img)return;
-      var src=img.getAttribute("data-src")||img.getAttribute("data-lazy")||img.getAttribute("data-srcset")||img.getAttribute("srcset")||img.getAttribute("src")||"";
-      if(src.indexOf(",")>-1||src.indexOf(" ")>-1)src=src.trim().split(",").trim().split(" ");
-      if(src.indexOf("//")===0)src="https:"+src;
-      if(!src||src.indexOf("data:")===0||/logo|icon|banner|flag|svg|payment|placeholder|empty/i.test(src))return;
-      try{
-        var fullImg=new URL(src,base.origin).href;
-        var fullLink=new URL(a.getAttribute("href"),base.origin).href;
-        if(fullLink===base.href||fullLink===base.origin+"/"||/#|javascript:|mailto:|tel:|wa\.me/i.test(fullLink))return;
-        if(!vistos[fullLink]){
-          vistos[fullLink]=true;
-          novos.push({img:fullImg,l:fullLink});
-        }
-      }catch(e){}
-    });
-    if(!novos.length)return alert("Nenhum produto encontrado. Certifique-se de copiar o código-fonte completo (Ctrl+U -> Ctrl+A -> Ctrl+C).");
-    itens=itens.concat(novos);
-    document.getElementById("htmlRaw").value="";
+    var arr=JSON.parse(txt);
+    if(!Array.isArray(arr)||!arr.length)throw new Error("Lista vazia.");
+    itens=itens.concat(arr);
+    document.getElementById("dadosColados").value="";
     render();
-  }catch(e){alert("Erro ao ler HTML: "+e.message);}
+  }catch(e){
+    alert("Formato inválido. Use o favorito extrator na página da loja para copiar os produtos.");
+  }
 };
 
 function toB64(u){
@@ -96,7 +96,7 @@ function toB64(u){
 }
 
 document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Extraia os produtos primeiro.");
+  if(!itens.length)return alert("Importe os produtos primeiro.");
   var btn=this;btn.innerText="Gerando...";btn.disabled=true;
   try{
     var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
@@ -124,7 +124,7 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v18.3 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v18.4 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
