@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18.2</title>
+<title>Lookbook PDF v18.3</title>
 <script src="https://cloudflare.com"></script>
 <style>
 *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
 .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
+input,select,textarea{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:13px}
 button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
 button:disabled{opacity:.6;cursor:not-allowed}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
@@ -21,12 +21,9 @@ button:disabled{opacity:.6;cursor:not-allowed}
 </head>
 <body>
 <div class="box">
-  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center">
     <div><b style="font-size:18px">Lookbook PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
-    <div style="display:flex;gap:8px">
-      <button id="bExtrair" style="background:#2563eb">⚡ EXTRAIR DO SITE</button>
-      <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
-    </div>
+    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
   </div>
   <div class="card g3">
     <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
@@ -37,6 +34,13 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
     <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
     <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
+  </div>
+  <div class="card">
+    <label>Extrair Produtos do Site (Abra o site → Ctrl+U → Ctrl+A → Ctrl+C → Cole abaixo)</label>
+    <div style="display:flex;gap:8px">
+      <textarea id="htmlRaw" rows="2" placeholder="Cole aqui o código-fonte (Ctrl+U) da página da loja ou categoria..."></textarea>
+      <button id="bExtrair" style="background:#2563eb;white-space:nowrap">⚡ EXTRAIR</button>
+    </div>
   </div>
   <div class="card">
     <div style="display:flex;justify-content:space-between"><label>Produtos Extraídos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
@@ -52,54 +56,37 @@ function render(){
 }
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
 
-async function buscarHtml(url){
-  var rotas=[
-    "https://allorigins.win"+encodeURIComponent(url),
-    "https://corsproxy.io?"+encodeURIComponent(url),
-    "https://codetabs.com"+encodeURIComponent(url)
-  ];
-  for(var i=0;i<rotas.length;i++){
-    try{
-      var r=await fetch(rotas[i]);
-      if(r.ok){var t=await r.text();if(t&&t.length>500)return t;}
-    }catch(e){}
-  }
-  throw new Error("Não foi possível acessar o site no momento.");
-}
-
-document.getElementById("bExtrair").onclick=async function(){
-  var siteUrl=document.getElementById("site").value.trim();
-  if(!siteUrl)return alert("Informe a URL do site.");
+document.getElementById("bExtrair").onclick=function(){
+  var raw=document.getElementById("htmlRaw").value.trim();
+  var siteUrl=document.getElementById("site").value.trim()||"https://simonelit.com";
   if(!/^https?:\/\//i.test(siteUrl))siteUrl="https://"+siteUrl;
-  var btn=this;btn.innerText="⏳ Extraindo...";btn.disabled=true;
+  if(!raw)return alert("Cole o código-fonte (Ctrl+U) da página primeiro.");
   try{
-    var html=await buscarHtml(siteUrl);
-    var doc=new DOMParser().parseFromString(html,"text/html");
+    var doc=new DOMParser().parseFromString(raw,"text/html");
     var base=new URL(siteUrl);
     var vistos={},novos=[];
-
     doc.querySelectorAll("a[href]").forEach(function(a){
       var img=a.querySelector("img");
       if(!img)return;
-      var src=img.getAttribute("data-src")||img.getAttribute("data-lazy")||img.getAttribute("src")||"";
-      if(!src&&img.getAttribute("srcset"))src=img.getAttribute("srcset").split(",").split(" ");
-      if(!src||src.indexOf("data:")===0||/logo|icon|banner|flag|svg|payment/i.test(src))return;
+      var src=img.getAttribute("data-src")||img.getAttribute("data-lazy")||img.getAttribute("data-srcset")||img.getAttribute("srcset")||img.getAttribute("src")||"";
+      if(src.indexOf(",")>-1||src.indexOf(" ")>-1)src=src.trim().split(",").trim().split(" ");
+      if(src.indexOf("//")===0)src="https:"+src;
+      if(!src||src.indexOf("data:")===0||/logo|icon|banner|flag|svg|payment|placeholder|empty/i.test(src))return;
       try{
         var fullImg=new URL(src,base.origin).href;
         var fullLink=new URL(a.getAttribute("href"),base.origin).href;
-        if(fullLink===base.href||fullLink===base.origin+"/")return;
+        if(fullLink===base.href||fullLink===base.origin+"/"||/#|javascript:|mailto:|tel:|wa\.me/i.test(fullLink))return;
         if(!vistos[fullLink]){
           vistos[fullLink]=true;
           novos.push({img:fullImg,l:fullLink});
         }
       }catch(e){}
     });
-
-    if(!novos.length)throw new Error("Nenhum produto com foto encontrado nesta página.");
+    if(!novos.length)return alert("Nenhum produto encontrado. Certifique-se de copiar o código-fonte completo (Ctrl+U -> Ctrl+A -> Ctrl+C).");
     itens=itens.concat(novos);
+    document.getElementById("htmlRaw").value="";
     render();
-  }catch(e){alert("Erro: "+e.message);}
-  btn.innerText="⚡ EXTRAIR DO SITE";btn.disabled=false;
+  }catch(e){alert("Erro ao ler HTML: "+e.message);}
 };
 
 function toB64(u){
@@ -109,7 +96,7 @@ function toB64(u){
 }
 
 document.getElementById("bPdf").onclick=async function(){
-  if(!itens.length)return alert("Extraia os produtos do site primeiro.");
+  if(!itens.length)return alert("Extraia os produtos primeiro.");
   var btn=this;btn.innerText="Gerando...";btn.disabled=true;
   try{
     var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
@@ -137,7 +124,7 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v18.2 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v18.3 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
