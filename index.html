@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lookbook PDF v18.1</title>
-<script src="https://cloudflare.com"></script>
+<title>Lookbook PDF v18</title>
+<script src="https://jsdelivr.net"></script>
 <style>
-*{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
-.box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
-input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
-button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
-.item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
-.item img{width:100%;height:100%;object-fit:cover}
-.del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
+  *{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
+  .box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
+  input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
+  button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
+  .item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
+  .item img{width:100%;height:100%;object-fit:cover}
+  .del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
 </style>
 </head>
 <body>
@@ -35,6 +35,18 @@ button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px
     <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
   </div>
   <div class="card">
+    <label>Adicionar Foto(s) + Link do Produto</label>
+    <div class="g3" style="margin-bottom:8px">
+      <input type="file" id="fImg" accept="image/*" multiple>
+      <input id="fLink" placeholder="Link do produto no site">
+      <button id="bAdd" style="background:#2563eb">+ Adicionar</button>
+    </div>
+    <div style="display:flex;gap:6px">
+      <input id="uImg" placeholder="Ou cole o link direto da foto (https://...)">
+      <button id="bUrl" style="background:#4f46e5">+ Link Foto</button>
+    </div>
+  </div>
+  <div class="card">
     <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
     <div id="grid" class="grid"></div>
   </div>
@@ -46,11 +58,22 @@ function render(){
   document.getElementById("qtd").innerText=itens.length;
   document.getElementById("grid").innerHTML=itens.map(function(it,i){return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';}).join("");
 }
+document.getElementById("bAdd").onclick=function(){
+  var f=document.getElementById("fImg");if(!f.files||!f.files.length)return alert("Escolha foto(s).");
+  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
+  Array.from(f.files).forEach(function(file){var r=new FileReader();r.onload=function(e){itens.push({img:e.target.result,l:l});render();};r.readAsDataURL(file);});
+  f.value="";
+};
+document.getElementById("bUrl").onclick=function(){
+  var u=document.getElementById("uImg").value.trim();if(!u)return alert("Cole o link da foto.");
+  var l=document.getElementById("fLink").value.trim()||document.getElementById("site").value;
+  itens.push({img:u,l:l});document.getElementById("uImg").value="";render();
+};
 document.getElementById("bLimpar").onclick=function(){itens=[];render();};
 function toB64(u){
   if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
-  return fetch("https://weserv.nl"+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
-  .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
+  return fetch("https://"+"images.weserv.nl/?url="+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
+    .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
 }
 document.getElementById("bPdf").onclick=async function(){
   if(!itens.length)return alert("Adicione fotos primeiro.");
@@ -59,7 +82,7 @@ document.getElementById("bPdf").onclick=async function(){
     var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
     if(!Ctor)throw new Error("Aguarde 2s e clique novamente (carregando PDF).");
     var doc=new Ctor(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
-    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
+    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://"+"wa.me/"+document.getElementById("wpp").value.replace(/\D/g,"");
     var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
     var cols=parseInt(document.getElementById("col").value)||2;
     doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
@@ -70,7 +93,7 @@ document.getElementById("bPdf").onclick=async function(){
     };
     doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
     for(var i=0;i<itens.length;i++){
-      var it=itens[i];
+      var it=itens.slice(i,i+1).shift();
       if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
       var x=m+col*(cw+gap),b64=await toB64(it.img);
       if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
@@ -81,7 +104,7 @@ document.getElementById("bPdf").onclick=async function(){
   }catch(e){alert("Erro: "+e.message);}
   btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
 };
-var st=document.getElementById("st");st.innerText="🟢 v18.1 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+var st=document.getElementById("st");st.innerText="🟢 v18 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
 </script>
 </body>
 </html>
