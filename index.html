@@ -1,217 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lookbook PDF v21</title>
-  <script src="https://cloudflare.com"></script>
-  <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { margin: 0; background: #f3f4f6; color: #1f2937; padding-bottom: 40px; }
-    .box { max-width: 920px; margin: 0 auto; padding: 12px; }
-    .card { background: #fff; padding: 16px; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-    .g3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
-    .g2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-    label { display: block; font-size: 11px; font-weight: 700; color: #4b5563; margin-bottom: 4px; text-transform: uppercase; }
-    input, select { width: 100%; padding: 9px; border: 1px solid #d1d5db; border-radius: 7px; font-size: 14px; background: #fff; }
-    input:focus, select:focus { outline: none; border-color: #2563eb; }
-    button { cursor: pointer; border: none; border-radius: 7px; font-weight: 700; padding: 10px 14px; font-size: 13px; color: #fff; transition: opacity 0.2s; }
-    button:hover { opacity: 0.9; }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .badge { font-size: 11px; padding: 3px 8px; border-radius: 6px; margin-left: 6px; font-weight: 700; display: inline-block; }
-    .badge-warn { background: #fef3c7; color: #b45309; }
-    .badge-ok { background: #dcfce7; color: #15803d; }
-    .badge-err { background: #fee2e2; color: #dc2626; }
-    .alert { padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; display: none; font-weight: 500; }
-    .alert-err { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-    .alert-ok { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; margin-top: 12px; }
-    .item { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; display: flex; flex-direction: column; }
-    .item-img { aspect-ratio: 3/4; background: #f9fafb; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center; }
-    .item-img img { width: 100%; height: 100%; object-fit: cover; }
-    .item-info { padding: 8px; display: flex; flex-direction: column; gap: 5px; background: #fff; }
-    .item-info input { padding: 6px 8px; font-size: 12px; }
-    .del { position: absolute; top: 6px; right: 6px; background: rgba(220, 38, 38, 0.92); color: #fff; border-radius: 50%; width: 24px; height: 24px; padding: 0; font-size: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-    .upload-box { background: #f9fafb; padding: 10px; border-radius: 8px; border: 1px dashed #d1d5db; }
-    .empty { grid-column: 1 / -1; text-align: center; padding: 28px 12px; color: #6b7280; font-size: 13px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lookbook PDF v18.1</title>
+<script src="https://cloudflare.com"></script>
+<style>
+*{box-sizing:border-box;font-family:sans-serif}body{margin:0;background:#f3f4f6;color:#1f2937}
+.box{max-width:900px;margin:0 auto;padding:12px}.card{background:#fff;padding:14px;border-radius:10px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+label{display:block;font-size:11px;font-weight:700;color:#4b5563;margin-bottom:4px;text-transform:uppercase}
+input,select{width:100%;padding:9px;border:1px solid #d1d5db;border-radius:7px;font-size:14px}
+button{cursor:pointer;border:none;border-radius:7px;font-weight:700;padding:10px 14px;font-size:13px;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;margin-top:10px}
+.item{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:3/4;background:#e5e7eb}
+.item img{width:100%;height:100%;object-fit:cover}
+.del{position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;border-radius:50%;width:22px;height:22px;padding:0;font-size:11px}
+</style>
 </head>
 <body>
-  <div class="box">
-    <div id="msgBox" class="alert"></div>
-
-    <!-- Cabeçalho -->
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div>
-        <b style="font-size:18px">Lookbook PDF</b>
-        <span id="st" class="badge badge-warn">⏳ Carregando...</span>
-      </div>
-      <button id="bPdf" style="background:#16a34a;font-size:14px;padding:11px 18px">📄 BAIXAR PDF</button>
-    </div>
-
-    <!-- Configurações da Loja -->
-    <div class="card g3">
-      <div><label>Nome da Loja</label><input id="loja" value="Loja Simone Lit"></div>
-      <div><label>Site Principal</label><input id="site" value="https://simonelit.com"></div>
-      <div><label>WhatsApp (com DDI)</label><input id="wpp" value="553132843022" placeholder="Ex: 5531999999999"></div>
-    </div>
-
-    <!-- Configurações de Layout -->
-    <div class="card g3">
-      <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
-      <div>
-        <label>Fotos por Linha</label>
-        <select id="col">
-          <option value="1">1 Grande (Destaque)</option>
-          <option value="2" selected>2 Padrão (Catálogo)</option>
-          <option value="3">3 Compacto (Vitrine)</option>
-        </select>
-      </div>
-      <div><label>Título da Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
-    </div>
-
-    <!-- Adicionar Produto -->
-    <div class="card">
-      <label>Adicionar Produto ao Catálogo</label>
-      <div class="g3" style="margin-bottom:10px">
-        <input id="fNome" placeholder="Nome da peça (opcional)">
-        <input id="fPreco" placeholder="Preço (Ex: R$ 299,90 - opcional)">
-        <input id="fLink" placeholder="Link do produto (opcional)">
-      </div>
-
-      <div class="g2">
-        <div class="upload-box">
-          <label style="margin-bottom:6px">Opção 1: Fotos do Dispositivo</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input type="file" id="fImg" accept="image/*" multiple style="border:none;padding:2px;background:transparent;font-size:12px">
-            <button id="bAdd" style="background:#2563eb;white-space:nowrap">+ Adicionar</button>
-          </div>
-        </div>
-
-        <div class="upload-box">
-          <label style="margin-bottom:6px">Opção 2: Link Direto da Imagem</label>
-          <div style="display:flex;gap:6px">
-            <input id="uImg" placeholder="https://.../foto.jpg">
-            <button id="bUrl" style="background:#4f46e5;white-space:nowrap">+ Link Foto</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Catálogo -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <label style="margin:0">Produtos no Catálogo (<span id="qtd">0</span>)</label>
-        <button id="bLimpar" style="background:#dc2626;padding:5px 10px;font-size:11px">Limpar Tudo</button>
-      </div>
-      <div id="grid" class="grid"></div>
-    </div>
+<div class="box">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+    <div><b style="font-size:18px">Lookbook PDF</b> <span id="st" style="font-size:11px;background:#fee2e2;color:#dc2626;padding:3px 7px;border-radius:6px">🔴 Erro</span></div>
+    <button id="bPdf" style="background:#16a34a">📄 BAIXAR PDF</button>
   </div>
-
-  <script>
-    var itens = [];
-
-    function notify(msg, isError) {
-      var box = document.getElementById("msgBox");
-      box.textContent = msg;
-      box.className = "alert " + (isError ? "alert-err" : "alert-ok");
-      box.style.display = "block";
-      clearTimeout(box._timer);
-      box._timer = setTimeout(function() { box.style.display = "none"; }, 5000);
-    }
-
-    function normalizeUrl(url, fallback) {
-      var u = (url || "").trim();
-      if (!u) return fallback || "";
-      if (!/^https?:\/\//i.test(u)) u = "https://" + u;
-      try {
-        return new URL(u).href;
-      } catch (e) {
-        return fallback || "";
-      }
-    }
-
-    window.onerror = function(m, u, l) {
-      var st = document.getElementById("st");
-      st.textContent = "⚠️ Erro L" + l;
-      st.className = "badge badge-err";
-      notify("Erro interno na linha " + l + ": " + m, true);
+  <div class="card g3">
+    <div><label>Loja</label><input id="loja" value="Loja Simone Lit"></div>
+    <div><label>Site</label><input id="site" value="https://simonelit.com"></div>
+    <div><label>WhatsApp</label><input id="wpp" value="553132843022"></div>
+  </div>
+  <div class="card g3">
+    <div><label>Cor Tema</label><input type="color" id="cor" value="#1e293b" style="height:38px;padding:2px"></div>
+    <div><label>Fotos/Linha</label><select id="col"><option value="1">1 Grande</option><option value="2" selected>2 Padrão</option><option value="3">3 Compacto</option></select></div>
+    <div><label>Capa</label><input id="capa" value="NOVA COLEÇÃO"></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between"><label>Fotos (<span id="qtd">0</span>)</label><button id="bLimpar" style="background:#dc2626;padding:4px 8px;font-size:11px">Limpar</button></div>
+    <div id="grid" class="grid"></div>
+  </div>
+</div>
+<script>
+window.onerror=function(m,u,l){document.getElementById("st").innerText="⚠️ L"+l+": "+m;};
+var itens=[];
+function render(){
+  document.getElementById("qtd").innerText=itens.length;
+  document.getElementById("grid").innerHTML=itens.map(function(it,i){return '<div class="item"><img src="'+it.img+'"><button class="del" onclick="itens.splice('+i+',1);render()">✕</button></div>';}).join("");
+}
+document.getElementById("bLimpar").onclick=function(){itens=[];render();};
+function toB64(u){
+  if(!u||u.indexOf("data:image")===0)return Promise.resolve(u);
+  return fetch("https://weserv.nl"+encodeURIComponent(u.replace(/^https?:\/\//,""))+"&w=600&output=jpg")
+  .then(function(r){return r.ok?r.blob():null;}).then(function(b){return b?new Promise(function(res){var rd=new FileReader();rd.onloadend=function(){res(rd.result);};rd.readAsDataURL(b);}):null;}).catch(function(){return null;});
+}
+document.getElementById("bPdf").onclick=async function(){
+  if(!itens.length)return alert("Adicione fotos primeiro.");
+  var btn=this;btn.innerText="Gerando...";btn.disabled=true;
+  try{
+    var Ctor=(window.jspdf&&window.jspdf.jsPDF)||window.jsPDF;
+    if(!Ctor)throw new Error("Aguarde 2s e clique novamente (carregando PDF).");
+    var doc=new Ctor(),w=doc.internal.pageSize.getWidth(),h=doc.internal.pageSize.getHeight();
+    var loja=document.getElementById("loja").value,site=document.getElementById("site").value,wpp="https://wa.me"+document.getElementById("wpp").value.replace(/\D/g,"");
+    var hex=document.getElementById("cor").value.replace("#",""),n=parseInt(hex,16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+    var cols=parseInt(document.getElementById("col").value)||2;
+    doc.setFillColor(r,g,b);doc.rect(0,0,w,h,"F");doc.setTextColor(255);doc.setFontSize(26);doc.text(loja.toUpperCase(),w/2,125,{align:"center"});
+    doc.setFontSize(13);doc.text(document.getElementById("capa").value.toUpperCase(),w/2,140,{align:"center"});
+    var rodape=function(){
+      doc.setFillColor(r,g,b);doc.roundedRect(w-92,h-17,40,9,2,2,"F");doc.setTextColor(255);doc.setFontSize(8);doc.text("VER NO SITE",w-72,h-11,{align:"center"});doc.link(w-92,h-17,40,9,{url:site});
+      doc.setFillColor(22,163,74);doc.roundedRect(w-50,h-17,40,9,2,2,"F");doc.text("WHATSAPP",w-30,h-11,{align:"center"});doc.link(w-50,h-17,40,9,{url:wpp});
     };
-
-    function render() {
-      document.getElementById("qtd").textContent = itens.length;
-      var grid = document.getElementById("grid");
-      grid.innerHTML = "";
-
-      if (!itens.length) {
-        var empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "Nenhum produto adicionado ainda. Escolha fotos do dispositivo ou cole o link de uma imagem acima.";
-        grid.appendChild(empty);
-        return;
-      }
-
-      itens.forEach(function(it, i) {
-        var card = document.createElement("div");
-        card.className = "item";
-
-        var imgWrap = document.createElement("div");
-        imgWrap.className = "item-img";
-
-        var img = document.createElement("img");
-        img.src = it.img;
-        img.alt = it.nome || "Produto";
-        img.onerror = function() {
-          this.onerror = null;
-          this.src = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
-            '<svg xmlns="http://w3.org" width="300" height="400"><rect width="100%" height="100%" fill="#f3f4f6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#9ca3af" font-family="sans-serif" font-size="14">Imagem não carregou</text></svg>'
-          );
-        };
-
-        var delBtn = document.createElement("button");
-        delBtn.className = "del";
-        delBtn.type = "button";
-        delBtn.title = "Remover produto";
-        delBtn.textContent = "✕";
-        delBtn.onclick = function() {
-          itens.splice(i, 1);
-          render();
-        };
-
-        imgWrap.appendChild(img);
-        imgWrap.appendChild(delBtn);
-
-        var info = document.createElement("div");
-        info.className = "item-info";
-
-        var inNome = document.createElement("input");
-        inNome.placeholder = "Nome da peça";
-        inNome.value = it.nome || "";
-        inNome.oninput = function() { itens[i].nome = this.value; };
-
-        var inPreco = document.createElement("input");
-        inPreco.placeholder = "Preço (ex: R$ 199,90)";
-        inPreco.value = it.preco || "";
-        inPreco.oninput = function() { itens[i].preco = this.value; };
-
-        var inLink = document.createElement("input");
-        inLink.placeholder = "Link do produto";
-        inLink.value = it.l || "";
-        inLink.onchange = function() {
-          itens[i].l = normalizeUrl(this.value, normalizeUrl(document.getElementById("site").value, "https://simonelit.com"));
-          this.value = itens[i].l;
-        };
-
-        info.appendChild(inNome);
-        info.appendChild(inPreco);
-        info.appendChild(inLink);
-
-        card.appendChild(imgWrap);
-        card.appendChild(info);
-        grid.appendChild(card);
-      });
+    doc.addPage();var m=10,gap=6,cw=(w-m*2-gap*(cols-1))/cols,ch=cols===1?220:(cols===2?115:78),col=0,y=14;
+    for(var i=0;i<itens.length;i++){
+      var it=itens[i];
+      if(y+ch>h-22){rodape();doc.addPage();y=14;col=0;}
+      var x=m+col*(cw+gap),b64=await toB64(it.img);
+      if(b64)try{doc.addImage(b64,"JPEG",x,y,cw,ch);}catch(e){}else{doc.setFillColor(240);doc.rect(x,y,cw,ch,"F");}
+      doc.link(x,y,cw,ch,{url:it.l||site});
+      col++;if(col>=cols){col=0;y+=ch+gap;}
     }
-
-    function clearInputs() {
-      document.getElementById("fNome").value = "";
-      document.getElementById("fPreco").value = "";
+    rodape();doc.save("Lookbook_"+loja.replace(/\s+/g,"_")+".pdf");
+  }catch(e){alert("Erro: "+e.message);}
+  btn.innerText="📄 BAIXAR PDF";btn.disabled=false;
+};
+var st=document.getElementById("st");st.innerText="🟢 v18.1 Ativo";st.style.background="#dcfce7";st.style.color="#15803d";
+</script>
+</body>
+</html>
